@@ -1,0 +1,13 @@
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 9px 16px; border: 1px solid transparent; border-radius: var(--farta-radius-control); font: var(--farta-type-label); text-align: center; cursor: pointer; transition: background 150ms ease, border-color 150ms ease, color 150ms ease; }
+.button:disabled { cursor: not-allowed; opacity: .6; }
+.primary { color: #fff; background: var(--farta-color-brand-primary); }
+.primary:hover:not(:disabled) { background: var(--farta-color-brand-hover); }
+.accent { color: var(--farta-color-brand-active); background: var(--farta-color-accent); }
+.accent:hover:not(:disabled) { background: var(--farta-color-accent-hover); }
+.secondary { color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border-color: var(--farta-color-border-strong); }
+.secondary:hover:not(:disabled) { background: var(--farta-color-surface-secondary); }
+.tertiary { color: var(--farta-color-brand-primary); background: transparent; }
+.tertiary:hover:not(:disabled) { background: var(--farta-color-success-soft); }
+.destructive { color: #fff; background: var(--farta-color-danger); }
+.destructive:hover:not(:disabled) { background: var(--farta-color-danger-hover); }
+@media (prefers-reduced-motion: reduce) { .button { transition: none; } }

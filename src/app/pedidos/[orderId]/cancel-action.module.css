@@ -1,0 +1,10 @@
+.dialog { width: min(calc(100% - 32px), 480px); max-height: calc(100svh - 32px); padding: 24px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); box-shadow: var(--farta-shadow-overlay); }
+.dialog::backdrop { background: rgb(13 30 23 / 56%); }
+.dialog form { display: grid; gap: 12px; }
+.dialog h2 { margin: 0; font: var(--farta-type-h3); }
+.dialog p { margin: 0; color: var(--farta-color-text-secondary); }
+.dialog label { margin-top: 8px; font: var(--farta-type-label); }
+.dialog textarea { width: 100%; min-height: 112px; padding: 12px 14px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); resize: vertical; }
+.dialog p[role="alert"] { color: var(--farta-color-danger); }
+.dialog form > div { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+@media (max-width: 480px) { .dialog form > div { flex-direction: column-reverse; } .dialog form > div button { width: 100%; } }

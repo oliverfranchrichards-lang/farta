@@ -1,0 +1,6 @@
+.badge { display: inline-flex; align-items: center; width: max-content; max-width: 100%; min-height: 26px; padding: 3px 10px; border-radius: var(--farta-radius-pill); font: 700 12px/18px Helvetica, Arial, sans-serif; text-align: center; }
+.default { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
+.success { color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); }
+.warning { color: var(--farta-color-warning); background: var(--farta-color-warning-soft); }
+.info { color: var(--farta-color-info); background: var(--farta-color-info-soft); }
+.error { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); }

@@ -1,0 +1,12 @@
+"use client";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { updatePassword } from "@/modules/auth/auth.actions";
+import { AuthCard, AuthShell, PasswordField, styles } from "../auth-shell";
+
+export default function ResetPasswordPage() {
+  const [password, setPassword] = useState(""); const [confirm, setConfirm] = useState(""); const [message, setMessage] = useState(""); const [error, setError] = useState(""); const [loading, setLoading] = useState(false); const noticeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (error || message) noticeRef.current?.focus(); }, [error, message]);
+  async function submit(event: React.FormEvent<HTMLFormElement>) { event.preventDefault(); setError(""); setMessage(""); if (password !== confirm) { setError("As senhas não coincidem."); return; } setLoading(true); const result = await updatePassword(password); setLoading(false); if (result.ok) setMessage(result.message ?? "Senha atualizada."); else setError(result.message); }
+  return <AuthShell><AuthCard><header className={styles.formHeader}><h2>Definir nova senha</h2><p>Escolha uma senha segura para continuar protegendo sua conta.</p></header><form className={styles.form} onSubmit={submit} noValidate>{(error || message) && <div id="reset-feedback" ref={noticeRef} tabIndex={-1} className={`${styles.notice} ${error ? styles.noticeError : styles.noticeSuccess}`} role={error ? "alert" : "status"}>{error || message}</div>}<PasswordField id="password" label="Nova senha" value={password} onChange={setPassword} describedBy="password-help reset-error" invalid={Boolean(error && password.length < 8)} /><span id="password-help" className={styles.fieldHint}>Use pelo menos 8 caracteres.</span><div className={styles.field}><label htmlFor="confirm-password">Confirmar nova senha</label><input id="confirm-password" type="password" autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} aria-invalid={Boolean(error && password !== confirm)} aria-describedby="reset-error" required /><span id="reset-error" className={styles.fieldError}>{error && password !== confirm ? error : undefined}</span></div><button className={styles.submit} type="submit" disabled={loading || Boolean(message)}>{loading ? "Atualizando…" : "Atualizar senha"}</button></form>{message && <p className={styles.footer}><Link className={styles.link} href="/auth/login">Ir para entrar</Link></p>}</AuthCard></AuthShell>;
+}

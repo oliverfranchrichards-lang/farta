@@ -1,0 +1,12 @@
+.controls{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-2)}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--outline-variant);border-radius:var(--radius-default);background:var(--surface-container-lowest)}
+.stepper button{display:grid;place-items:center;width:44px;min-height:44px;padding:0;border:0;border-radius:var(--radius-default);background:transparent;color:var(--primary);font:inherit;font-size:19px;cursor:pointer}
+.stepper button:hover:not(:disabled){background:var(--surface-container-low)}
+.stepper button:disabled,.remove:disabled{opacity:.45;cursor:not-allowed}
+.quantityInput{width:58px;min-height:44px;padding:0 4px;border:0;border-right:1px solid var(--outline-variant);border-left:1px solid var(--outline-variant);border-radius:0;background:transparent;color:var(--on-surface);font:inherit;font-weight:600;text-align:center;outline:0}
+.quantityInput:focus{box-shadow:inset 0 0 0 2px var(--primary)}
+.quantityInput:disabled{opacity:.55;cursor:not-allowed}
+.quantityInput::-webkit-inner-spin-button,.quantityInput::-webkit-outer-spin-button{margin:0}
+.remove{min-height:44px;padding:0 var(--space-2);border:0;border-radius:var(--radius-default);background:transparent;color:var(--on-surface-variant);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
+.remove:hover:not(:disabled){color:var(--error)}
+.pending{color:var(--on-surface-variant);font-size:12px}

@@ -1,0 +1,2 @@
+.card { min-width: 0; padding: 24px; background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); box-shadow: none; }
+@media (max-width: 639px) { .card { padding: 16px; } }

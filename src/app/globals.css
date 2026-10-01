@@ -1,49 +1,127 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --farta-color-brand-primary: #1b3b2e;
+  --farta-color-brand-hover: #12291f;
+  --farta-color-brand-active: #0d1e17;
+  --farta-color-accent: #f2994a;
+  --farta-color-accent-hover: #d97d2e;
+  --farta-color-surface-page: #faf8f4;
+  --farta-color-surface-primary: #fff;
+  --farta-color-surface-secondary: #f4f1eb;
+  --farta-color-text-primary: #14231d;
+  --farta-color-text-secondary: #667369;
+  --farta-color-text-muted: #87928b;
+  --farta-color-border-default: #e7e2d9;
+  --farta-color-border-strong: #cfc8bc;
+  --farta-color-success: #2f9e62;
+  --farta-color-success-soft: #eaf6ee;
+  --farta-color-warning: #a66c00;
+  --farta-color-warning-soft: #fff6db;
+  --farta-color-danger: #b92f36;
+  --farta-color-danger-hover: #9f232b;
+  --farta-color-danger-soft: #fdecec;
+  --farta-color-info: #245fb8;
+  --farta-color-info-soft: #eaf2fe;
+  --farta-space-1: 4px;
+  --farta-space-2: 8px;
+  --farta-space-3: 12px;
+  --farta-space-4: 16px;
+  --farta-space-5: 20px;
+  --farta-space-6: 24px;
+  --farta-space-8: 32px;
+  --farta-space-10: 40px;
+  --farta-space-12: 48px;
+  --farta-space-16: 64px;
+  --farta-radius-control: 12px;
+  --farta-radius-card: 16px;
+  --farta-radius-pill: 999px;
+  --farta-border-default: 1px solid var(--farta-color-border-default);
+  --farta-shadow-overlay: 0 16px 48px rgb(20 35 29 / 16%);
+  --farta-type-h1: 700 40px/48px "Gilroy", Arial, sans-serif;
+  --farta-type-h2: 700 28px/36px "Gilroy", Arial, sans-serif;
+  --farta-type-h3: 700 20px/28px "Gilroy", Arial, sans-serif;
+  --farta-type-body: 400 16px/24px Helvetica, Arial, sans-serif;
+  --farta-type-body-sm: 400 14px/20px Helvetica, Arial, sans-serif;
+  --farta-type-label: 700 14px/20px Helvetica, Arial, sans-serif;
+  --farta-type-caption: 400 13px/18px Helvetica, Arial, sans-serif;
+  --farta-type-number: 700 36px/40px "Recoleta", Georgia, serif;
+
+  /* Compatibility aliases for pages being migrated in later batches. */
+  --surface: var(--farta-color-surface-page);
+  --surface-dim: var(--farta-color-border-strong);
+  --surface-bright: var(--farta-color-surface-page);
+  --surface-container-lowest: var(--farta-color-surface-primary);
+  --surface-container-low: var(--farta-color-surface-secondary);
+  --surface-container: var(--farta-color-surface-secondary);
+  --surface-container-high: var(--farta-color-border-default);
+  --surface-container-highest: var(--farta-color-border-strong);
+  --on-surface: var(--farta-color-text-primary);
+  --on-surface-variant: var(--farta-color-text-secondary);
+  --outline: var(--farta-color-border-strong);
+  --outline-variant: var(--farta-color-border-default);
+  --primary: var(--farta-color-brand-primary);
+  --on-primary: #fff;
+  --primary-container: var(--farta-color-brand-hover);
+  --on-primary-container: #fff;
+  --secondary: var(--farta-color-success);
+  --on-secondary: #fff;
+  --secondary-container: var(--farta-color-success-soft);
+  --on-secondary-container: var(--farta-color-brand-primary);
+  --tertiary: var(--farta-color-text-secondary);
+  --on-tertiary: #fff;
+  --tertiary-container: var(--farta-color-surface-secondary);
+  --on-tertiary-container: var(--farta-color-text-primary);
+  --error: var(--farta-color-danger);
+  --on-error: #fff;
+  --error-container: var(--farta-color-danger-soft);
+  --on-error-container: var(--farta-color-danger);
+  --spacing-unit: 4px;
+  --space-1: var(--farta-space-1);
+  --space-2: var(--farta-space-2);
+  --space-3: var(--farta-space-3);
+  --space-4: var(--farta-space-4);
+  --space-5: var(--farta-space-5);
+  --space-6: var(--farta-space-6);
+  --space-8: var(--farta-space-8);
+  --space-10: var(--farta-space-10);
+  --space-12: var(--farta-space-12);
+  --space-16: var(--farta-space-16);
+  --radius-sm: 4px;
+  --radius-default: var(--farta-radius-control);
+  --radius-md: var(--farta-radius-control);
+  --radius-lg: var(--farta-radius-card);
+  --radius-xl: var(--farta-radius-card);
+  --radius-full: var(--farta-radius-pill);
+  --radius-control: var(--farta-radius-control);
+  --radius-panel: var(--farta-radius-card);
+  --radius-card: var(--farta-radius-card);
+  --radius-pill: var(--farta-radius-pill);
+  --elevation-1: none;
+  --elevation-2: var(--farta-shadow-overlay);
+  --focus-ring: 0 0 0 3px rgb(47 158 98 / 24%);
+  --shadow-card: none;
+  --shadow-card-mobile: none;
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-container-lowest);
+  --color-surface-subtle: var(--surface-container-low);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-muted: var(--on-surface-variant);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--farta-color-brand-hover);
+  --color-primary-soft: var(--farta-color-success-soft);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-error: var(--error);
+  --color-border: var(--farta-color-border-default);
+  --font-manrope: "Gilroy", Arial;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+html, body { max-width: 100%; }
+body { min-height: 100svh; margin: 0; color: var(--farta-color-text-primary); background: var(--farta-color-surface-page); font: var(--farta-type-body); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, h6 { font-family: "Gilroy", Arial, sans-serif; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+:focus-visible { outline: 2px solid var(--farta-color-success); outline-offset: 2px; }
+@media (max-width: 639px) { h1 { font-size: 30px; line-height: 36px; } h2 { font-size: 22px; line-height: 30px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

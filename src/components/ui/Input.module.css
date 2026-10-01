@@ -1,0 +1,13 @@
+.field { display: grid; gap: 8px; min-width: 0; }
+.label { color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.input { width: 100%; min-height: 48px; padding: 11px 14px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body); outline: 0; transition: border-color 150ms ease, box-shadow 150ms ease; }
+.input::placeholder { color: var(--farta-color-text-muted); }
+.input:focus { border-color: var(--farta-color-success); box-shadow: var(--focus-ring); }
+.input[aria-invalid="true"] { border-color: var(--farta-color-danger); }
+.input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--farta-color-danger-soft); }
+.input:disabled { color: var(--farta-color-text-muted); background: var(--farta-color-surface-secondary); cursor: not-allowed; }
+.hint, .error { font: var(--farta-type-caption); }
+.hint { color: var(--farta-color-text-secondary); }
+.error { color: var(--farta-color-danger); }
+.textarea { min-height: 104px; resize: vertical; }
+@media (prefers-reduced-motion: reduce) { .input { transition: none; } }

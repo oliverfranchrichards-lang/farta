@@ -1,0 +1,40 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from '@/modules/auth/auth.actions';
+import { AuthCard, AuthShell, PasswordField, styles } from '../auth-shell';
+
+const TOKEN = /^[0-9a-f]{64}$/i;
+
+export default function LoginContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const invite = searchParams.get('invite');
+  const inviteToken = invite && TOKEN.test(invite) ? invite : '';
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [field, setField] = useState<string>(); const [loading, setLoading] = useState(false); const noticeRef = useRef<HTMLDivElement>(null);
+  const callbackError = searchParams.get('error') === 'auth_callback' ? 'Não foi possível confirmar o acesso. Solicite um novo link e tente novamente.' : '';
+  const feedback = error || callbackError;
+  useEffect(() => { if (feedback) noticeRef.current?.focus(); }, [feedback]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError(''); setField(undefined); setLoading(true);
+    try { const result = await signIn({ email, password, inviteToken: inviteToken || undefined }); if (!result.ok) { setError(result.message); setField(result.field); return; } router.push(inviteToken ? `/auth/invite/accept?token=${encodeURIComponent(inviteToken)}` : '/auth/after-login'); router.refresh(); }
+    catch { setError('Não foi possível concluir o acesso. Verifique os dados e tente novamente.'); }
+    finally { setLoading(false); }
+  }
+  const signupHref = inviteToken ? `/auth/signup?invite=${encodeURIComponent(inviteToken)}` : '/auth/signup';
+  return <AuthShell><AuthCard>
+    <header className={styles.formHeader}><h2>Entrar na sua conta</h2><p>{inviteToken ? 'Entre para continuar com o convite recebido.' : 'Acesse a operação da sua empresa com seu e-mail e senha.'}</p></header>
+    <form className={styles.form} onSubmit={submit} noValidate>
+      {feedback && !field && <div id="login-error" ref={noticeRef} tabIndex={-1} className={`${styles.notice} ${styles.noticeError}`} role="alert" aria-live="assertive">{feedback}</div>}
+      <div className={styles.field}><label htmlFor="email">E-mail</label><input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} aria-invalid={field === 'email'} aria-describedby={field === 'email' ? 'email-error' : feedback ? 'login-error' : undefined} required />{field === 'email' && <span id="email-error" className={styles.fieldError}>{error}</span>}</div>
+      <div className={styles.passwordRow}><label htmlFor="password">Senha</label><Link className={styles.link} href="/auth/forgot-password">Esqueci minha senha</Link></div>
+      <PasswordField id="password" label="" value={password} onChange={setPassword} autoComplete="current-password" invalid={field === 'password'} describedBy={field === 'password' ? 'password-error' : feedback ? 'login-error' : undefined} />
+      {field === 'password' && <span id="password-error" className={styles.fieldError}>{error}</span>}
+      <button className={styles.submit} type="submit" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}</button>
+    </form>
+    <p className={styles.footer}>Ainda não tem uma conta? <Link className={styles.link} href={signupHref}>Criar conta</Link></p>
+  </AuthCard></AuthShell>;
+}
