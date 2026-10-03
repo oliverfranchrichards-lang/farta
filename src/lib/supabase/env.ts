@@ -28,3 +28,8 @@ export function getSiteUrl() {
     throw new Error('NEXT_PUBLIC_SITE_URL deve ser uma URL HTTP(S) válida.');
   }
 }
+
+/** Google OAuth is opt-in per environment. The provider secret stays in Supabase. */
+export function isGoogleAuthEnabled() {
+  return process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED?.trim().toLowerCase() === 'true';
+}

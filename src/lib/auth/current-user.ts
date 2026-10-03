@@ -22,7 +22,17 @@ export async function getCurrentUser() {
     return null;
   }
 
-  return { user, profile };
+  let company: { display_name: string } | null = null;
+  if (profile.company_id) {
+    const { data } = await supabase
+      .from('companies')
+      .select('display_name')
+      .eq('id', profile.company_id)
+      .maybeSingle();
+    company = data;
+  }
+
+  return { user, profile, company };
 }
 
 export async function requireCustomerPage() {

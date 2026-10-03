@@ -86,6 +86,7 @@ export type CompanyOrderDetails = {
   customer?: { name: string | null; phone: string | null } | null;
   status: string; createdAt: string; confirmedWindow: Record<string, unknown> | null; requestedWindow: Record<string, unknown> | null;
   address: Record<string, unknown>; subtotalMinor: number; deliveryFeeMinor: number; totalMinor: number;
+  customerNote: string | null;
   approximateSubtotalMinor: number | null; approximateTotalMinor: number | null; finalSubtotalMinor: number | null; finalTotalMinor: number | null; finalConfirmedAt: string | null;
   items: Array<{ id: string; skuId: string; skuCode: string | null; productName: string; brand: string | null; variantName: string; unit: string; quantity: number; unitPriceMinor: number; subtotalMinor: number; approximateUnitPriceMinor: number | null; approximateSubtotalMinor: number | null; finalUnitPriceMinor: number | null; finalSubtotalMinor: number | null }>;
   history: Array<{ fromStatus: string | null; toStatus: string; changedAt: string; reason: string | null }>;

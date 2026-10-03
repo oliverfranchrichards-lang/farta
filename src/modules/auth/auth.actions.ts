@@ -1,11 +1,15 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { getSiteUrl } from '@/lib/supabase/env';
+import { getSiteUrl, isGoogleAuthEnabled } from '@/lib/supabase/env';
 
 type AuthResult =
   | { ok: true; message?: string; session?: boolean }
   | { ok: false; message: string; field?: 'email' | 'password' };
+
+type OAuthResult =
+  | { ok: true; url: string }
+  | { ok: false; message: string };
 
 const GENERIC_AUTH_ERROR = 'Não foi possível concluir a operação. Verifique os dados e tente novamente.';
 
@@ -22,6 +26,46 @@ export async function signIn(input: { email: string; password: string; inviteTok
   const { error } = await supabase.auth.signInWithPassword({ email: input.email.trim().toLowerCase(), password: input.password });
   if (error) return { ok: false, message: GENERIC_AUTH_ERROR };
   return { ok: true };
+}
+
+export async function signInWithGoogle(inviteToken?: string): Promise<OAuthResult> {
+  if (!isGoogleAuthEnabled()) return { ok: false, message: 'O login com Google ainda não está disponível.' };
+  const normalizedInvite = typeof inviteToken === 'string' ? inviteToken : '';
+  if (normalizedInvite && !/^[0-9a-f]{64}$/i.test(normalizedInvite)) {
+    return { ok: false, message: 'Não foi possível iniciar este convite.' };
+  }
+  const supabase = await createClient();
+  const callbackUrl = new URL('/auth/callback', getSiteUrl());
+  callbackUrl.searchParams.set('provider', 'google');
+  if (normalizedInvite) callbackUrl.searchParams.set('invite', normalizedInvite);
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: callbackUrl.toString(), queryParams: { access_type: 'offline', prompt: 'select_account' } },
+  });
+  if (error || !data.url) {
+    console.error('AUTH_GOOGLE_START_FAILED', JSON.stringify({ code: error?.code, message: error?.message, status: error?.status }));
+    return { ok: false, message: 'Não foi possível iniciar o login com Google. Tente novamente.' };
+  }
+  return { ok: true, url: data.url };
+}
+
+export async function linkGoogleIdentity(): Promise<OAuthResult> {
+  if (!isGoogleAuthEnabled()) return { ok: false, message: 'O login com Google ainda não está disponível.' };
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, message: 'Entre com e-mail e senha antes de vincular o Google.' };
+  const callbackUrl = new URL('/auth/callback', getSiteUrl());
+  callbackUrl.searchParams.set('provider', 'google');
+  callbackUrl.searchParams.set('link', '1');
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: 'google',
+    options: { redirectTo: callbackUrl.toString(), queryParams: { access_type: 'offline', prompt: 'select_account' } },
+  });
+  if (error || !data.url) {
+    console.error('AUTH_GOOGLE_LINK_START_FAILED', JSON.stringify({ code: error?.code, message: error?.message, status: error?.status }));
+    return { ok: false, message: 'Não foi possível vincular o Google a esta conta. Tente novamente.' };
+  }
+  return { ok: true, url: data.url };
 }
 
 export async function signUp(input: { fullName: string; email: string; password: string; inviteToken?: string }): Promise<AuthResult> {

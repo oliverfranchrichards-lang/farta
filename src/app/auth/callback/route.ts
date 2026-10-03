@@ -7,6 +7,13 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const invite = url.searchParams.get("invite") ?? "";
+  const oauthError = url.searchParams.get("error");
+  const oauthProvider = url.searchParams.get("provider");
+  const oauthErrorCode = url.searchParams.get("error_code") ?? "";
+  if (oauthError && oauthProvider === 'google') {
+    const duplicate = oauthErrorCode === 'identity_already_exists' || /already exists|already registered/i.test(url.searchParams.get('error_description') ?? '');
+    return NextResponse.redirect(new URL(`/auth/login?error=${duplicate ? 'google_existing_account' : 'google_cancelled'}`, request.url));
+  }
   if (!code) return NextResponse.redirect(new URL("/auth/login?error=auth_callback", request.url));
   try {
     const supabase = await createClient();
@@ -22,7 +29,7 @@ export async function GET(request: Request) {
       }
       return NextResponse.redirect(new URL("/catalogo", request.url));
     }
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/auth/after-login", request.url));
   } catch {
     return NextResponse.redirect(new URL("/auth/login?error=auth_callback", request.url));
   }

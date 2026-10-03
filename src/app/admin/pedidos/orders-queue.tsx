@@ -286,6 +286,10 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
               <a className={styles.whatsappLink} href={whatsappUrl(detailOrder.customer?.phone) ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={`Conversar pelo WhatsApp com ${detailOrder.customer?.name || 'cliente'} (abre em nova aba)`}>Conversar pelo WhatsApp (abre em nova aba)</a>
             </> : <p className={styles.contactUnavailable}>Telefone não informado ou indisponível para contato.</p>}
           </section>
+          <section className={styles.contact} aria-labelledby="customer-note-title">
+            <h3 id="customer-note-title">Observações do pedido</h3>
+            <p>{detailOrder.customerNote || 'Nenhuma observação informada.'}</p>
+          </section>
           {detailOrder.status === 'CONFIRMED' && <p className={styles.detailHint}>Confira os itens antes de iniciar a separação.</p>}
           {detailOrder.status === 'SUBMITTED_FOR_REVIEW' && <section className={styles.priceReview} aria-labelledby="price-review-title">
             <h3 id="price-review-title">Definir preços finais</h3>

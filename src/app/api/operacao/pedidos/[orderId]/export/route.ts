@@ -39,6 +39,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ orde
     document.moveDown(0.5).fontSize(14).fillColor("#17231d").text(`#${order.orderNumber} · ${order.status}`);
     document.fontSize(10).fillColor("#55635b").text(`${order.companyName} · ${order.establishmentName}`);
     document.text(new Date(order.createdAt).toLocaleString("pt-BR"));
+    document.moveDown(0.5).fontSize(10).fillColor("#55635b").text(`Observações: ${order.customerNote || "Nenhuma observação informada"}`);
     document.moveDown().fontSize(13).fillColor("#17231d").text("Itens do pedido");
     for (const item of order.items) {
       document.moveDown(0.35).fontSize(10).text(`${item.quantity}×  ${item.productName} — ${item.variantName} (${item.unit})`);
@@ -55,13 +56,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ orde
   sheet.columns = [
     { header: "Pedido", key: "order", width: 12 }, { header: "Empresa", key: "company", width: 28 },
     { header: "Estabelecimento", key: "establishment", width: 28 }, { header: "Status", key: "status", width: 22 },
-    { header: "Data", key: "createdAt", width: 22 }, { header: "Produto", key: "product", width: 32 },
+    { header: "Data", key: "createdAt", width: 22 }, { header: "Observações", key: "customerNote", width: 42 }, { header: "Produto", key: "product", width: 32 },
     { header: "Marca", key: "brand", width: 20 }, { header: "Variante", key: "variant", width: 25 },
     { header: "Unidade", key: "unit", width: 16 }, { header: "SKU", key: "sku", width: 18 },
     { header: "Quantidade", key: "quantity", width: 14 }, { header: "Preço unitário", key: "unitPrice", width: 18 },
     { header: "Subtotal", key: "subtotal", width: 16 }, { header: "Total do pedido", key: "total", width: 18 },
   ];
-  for (const item of order.items) sheet.addRow({ order: order.orderNumber, company: order.companyName, establishment: order.establishmentName, status: order.status, createdAt: new Date(order.createdAt).toLocaleString("pt-BR"), product: item.productName, brand: item.brand ?? "", variant: item.variantName, unit: item.unit, sku: item.skuCode ?? "", quantity: item.quantity, unitPrice: money(item.unitPriceMinor), subtotal: money(item.subtotalMinor), total: money(order.totalMinor) });
+  for (const item of order.items) sheet.addRow({ order: order.orderNumber, company: order.companyName, establishment: order.establishmentName, status: order.status, createdAt: new Date(order.createdAt).toLocaleString("pt-BR"), customerNote: order.customerNote || "Nenhuma observação informada", product: item.productName, brand: item.brand ?? "", variant: item.variantName, unit: item.unit, sku: item.skuCode ?? "", quantity: item.quantity, unitPrice: money(item.unitPriceMinor), subtotal: money(item.subtotalMinor), total: money(order.totalMinor) });
   sheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
   sheet.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF163C2D" } };
   const xlsx = await workbook.xlsx.writeBuffer();

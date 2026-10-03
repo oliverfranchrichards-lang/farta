@@ -10,6 +10,11 @@
 .summaryHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
 .summaryHeader h2 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
 .summaryHeader span { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.filterBar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 0 0 20px; padding: 16px; background: var(--farta-color-surface-secondary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
+.filterField { display: grid; gap: 6px; min-width: min(100%, 260px); color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.filterField input, .filterField select { min-height: 44px; padding: 9px 12px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.filterField input:focus-visible, .filterField select:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.filterSummary { margin: -8px 0 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
 .count { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; min-height: 28px; margin-left: 8px; padding: 0 8px; color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border-radius: var(--farta-radius-pill); font: var(--farta-type-label); }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .card { position: relative; padding: 26px 28px; background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); box-shadow: 0 2px 8px rgb(20 35 29 / 3%); }

@@ -57,6 +57,7 @@ export type OrderDetails = {
   approximateTotalMinor: number | null;
   finalTotalMinor: number | null;
   finalConfirmedAt: string | null;
+  customerNote: string | null;
   delivery: string;
   address: string;
   items: Array<{ id: string; name: string; unit: string; quantity: number; unitPriceMinor: number; subtotalMinor: number; approximateUnitPriceMinor: number | null; finalUnitPriceMinor: number | null }>;
@@ -69,7 +70,7 @@ export async function getOrderDetails(orderId: string): Promise<{ ok: true; orde
   const supabase = await createClient();
   const context = await resolveCustomerContext(supabase);
   if (!context.ok) return { ok: false, message: context.message };
-  const { data: order, error } = await supabase.from("orders").select("id, order_number, status, created_at, total_minor, approximate_total_minor, final_total_minor, final_confirmed_at, confirmed_window, address_snapshot, order_items(id, sku_name_snapshot, sale_unit_snapshot, quantity, unit_price_minor, subtotal_minor, approximate_unit_price_minor, final_unit_price_minor, approximate_subtotal_minor, final_subtotal_minor, product_variants(name, products(name, brand))), order_status_history(from_status, to_status, changed_at, reason)").eq("id", orderId).maybeSingle();
+  const { data: order, error } = await supabase.from("orders").select("id, order_number, status, created_at, total_minor, approximate_total_minor, final_total_minor, final_confirmed_at, customer_note, confirmed_window, address_snapshot, order_items(id, sku_name_snapshot, sale_unit_snapshot, quantity, unit_price_minor, subtotal_minor, approximate_unit_price_minor, final_unit_price_minor, approximate_subtotal_minor, final_subtotal_minor, product_variants(name, products(name, brand))), order_status_history(from_status, to_status, changed_at, reason)").eq("id", orderId).maybeSingle();
   if (error || !order) return { ok: false, message: "Não foi possível carregar os detalhes do pedido." };
   const snapshot = order.address_snapshot && typeof order.address_snapshot === "object" ? order.address_snapshot as Record<string, unknown> : null;
   const street = snapshot ? [snapshot.address_line, snapshot.address_number].filter(Boolean).map(String).join(", ") : "";
@@ -88,6 +89,7 @@ export async function getOrderDetails(orderId: string): Promise<{ ok: true; orde
     approximateTotalMinor: order.approximate_total_minor,
     finalTotalMinor: order.final_total_minor,
     finalConfirmedAt: order.final_confirmed_at,
+    customerNote: order.customer_note,
     delivery: typeof order.confirmed_window === "object" && order.confirmed_window && "label" in order.confirmed_window ? String(order.confirmed_window.label) : "Aguardando previsão",
     address,
     items: (order.order_items ?? []).map(item => ({ id: item.id, name: item.product_variants?.products?.name ?? item.sku_name_snapshot, unit: `${item.product_variants?.name ?? item.sku_name_snapshot} · ${item.sale_unit_snapshot}`, quantity: item.quantity, unitPriceMinor: item.final_unit_price_minor ?? item.approximate_unit_price_minor ?? item.unit_price_minor, subtotalMinor: item.final_subtotal_minor ?? item.approximate_subtotal_minor ?? item.subtotal_minor, approximateUnitPriceMinor: item.approximate_unit_price_minor, finalUnitPriceMinor: item.final_unit_price_minor })),
@@ -230,25 +232,29 @@ export async function confirmActiveCart(input: {
   cartId: string;
   addressId: string;
   deliveryWindow: "Hoje" | "Amanhã";
+  customerNote?: string;
 }): Promise<ConfirmOrderResult> {
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!input || typeof input !== "object" || !uuid.test(input.cartId) || !uuid.test(input.addressId)) return { ok: false, message: "Selecione um endereço vÒ¡lido." };
   if (input.deliveryWindow !== "Hoje" && input.deliveryWindow !== "Amanhã") return { ok: false, message: "Selecione uma janela de entrega válida." };
+  const customerNote = typeof input.customerNote === "string" ? input.customerNote.trim() : "";
+  if (customerNote.length > 500) return { ok: false, message: "A observação deve ter no máximo 500 caracteres." };
   const supabase = await createClient();
   const context = await resolveCustomerContext(supabase);
   if (!context.ok) return { ok: false, message: context.message };
   if (!context.selected) return { ok: false, message: "Selecione um estabelecimento." };
   const { data: selectedCart } = await supabase.from("carts").select("establishment_id").eq("id", input.cartId).eq("company_id", context.companyId).maybeSingle();
   if (selectedCart?.establishment_id !== context.selected.id) return { ok: false, message: "O carrinho não pertence ao estabelecimento selecionado." };
-  const { data, error } = await supabase.rpc("submit_order_for_review", {
+  const { data, error } = await supabase.rpc("submit_order_for_review_with_note", {
     p_cart_id: input.cartId,
     p_address_id: input.addressId,
     p_window_label: input.deliveryWindow,
+    p_customer_note: customerNote || undefined,
     p_idempotency_key: crypto.randomUUID(),
   });
 
   if (error || !data?.[0]) {
-    const code = error?.message.match(/(ACTIVE_PROFILE_REQUIRED|ACTIVE_MEMBERSHIP_REQUIRED|ACTIVE_CART_NOT_FOUND|ADDRESS_REQUIRED|ADDRESS_NOT_AVAILABLE|CART_EMPTY|INSUFFICIENT_STOCK|PRICE_UNAVAILABLE|INVENTORY_LOCATION_NOT_FOUND|MINIMUM_QUANTITY_NOT_MET|INVALID_DELIVERY_WINDOW)/)?.[1];
+    const code = error?.message.match(/(ACTIVE_PROFILE_REQUIRED|ACTIVE_MEMBERSHIP_REQUIRED|ACTIVE_CART_NOT_FOUND|ADDRESS_REQUIRED|ADDRESS_NOT_AVAILABLE|CART_EMPTY|INSUFFICIENT_STOCK|PRICE_UNAVAILABLE|INVENTORY_LOCATION_NOT_FOUND|MINIMUM_QUANTITY_NOT_MET|INVALID_DELIVERY_WINDOW|INVALID_CUSTOMER_NOTE)/)?.[1];
     const messages: Record<string, string> = {
       ACTIVE_PROFILE_REQUIRED: "Seu perfil operacional ainda não foi configurado. Saia e entre novamente.",
       ACTIVE_CART_NOT_FOUND: "Não há um carrinho ativo para este estabelecimento.",
@@ -261,6 +267,7 @@ export async function confirmActiveCart(input: {
       INVENTORY_LOCATION_NOT_FOUND: "O local de estoque ainda não estÒ¡ configurado.",
       MINIMUM_QUANTITY_NOT_MET: "Revise as quantidades mÃ­nimas dos itens antes de enviar o pedido.",
       INVALID_DELIVERY_WINDOW: "Selecione uma janela de entrega válida.",
+      INVALID_CUSTOMER_NOTE: "A observação deve ter no máximo 500 caracteres.",
     };
     const message = (code && messages[code]) ?? "Não foi possível enviar o pedido para análise.";
     return { ok: false, message };

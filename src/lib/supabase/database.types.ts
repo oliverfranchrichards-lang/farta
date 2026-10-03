@@ -1432,6 +1432,7 @@ export type Database = {
           created_at: string
           created_by_profile_id: string
           currency_code: string
+          customer_note: string | null
           delivery_fee_minor: number
           establishment_id: string
           final_confirmed_at: string | null
@@ -1459,6 +1460,7 @@ export type Database = {
           created_at?: string
           created_by_profile_id: string
           currency_code?: string
+          customer_note?: string | null
           delivery_fee_minor?: number
           establishment_id: string
           final_confirmed_at?: string | null
@@ -1486,6 +1488,7 @@ export type Database = {
           created_at?: string
           created_by_profile_id?: string
           currency_code?: string
+          customer_note?: string | null
           delivery_fee_minor?: number
           establishment_id?: string
           final_confirmed_at?: string | null
@@ -2577,6 +2580,19 @@ export type Database = {
           order_number: number
         }[]
       }
+      submit_order_for_review_with_note: {
+        Args: {
+          p_address_id: string
+          p_cart_id: string
+          p_customer_note?: string
+          p_idempotency_key?: string
+          p_window_label: string
+        }
+        Returns: {
+          order_id: string
+          order_number: number
+        }[]
+      }
       update_my_profile_phone: { Args: { p_phone: string }; Returns: Json }
     }
     Enums: {
@@ -2713,3 +2729,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

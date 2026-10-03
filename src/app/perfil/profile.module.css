@@ -5,6 +5,7 @@
 .summary p:not(.eyebrow) { margin: 4px 0 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); overflow-wrap: anywhere; }
 .eyebrow { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-caption); letter-spacing: .08em; }
 .role { display: inline-flex; padding: 6px 10px; color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border-radius: var(--farta-radius-pill); font: var(--farta-type-caption); font-weight: 700; }
+.company { margin: 12px 0 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .form { display: grid; gap: 18px; }
 .form h2 { margin: 4px 0; font: var(--farta-type-h3); }
 .help { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }

@@ -49,6 +49,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ o
     <div className={styles.grid}>
       <Card className={styles.summary}>
         <h2>Resumo</h2>
+        <div><dt>Observações</dt><dd>{order.customerNote || 'Nenhuma observação informada'}</dd></div>
         <dl><div><dt>Entrega</dt><dd>{order.delivery}</dd></div><div><dt>Endereço</dt><dd>{order.address}</dd></div></dl>
         <div className={styles.total}><span>{order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" ? "Total final" : "Total"}</span><strong>{money(order.totalMinor)}</strong></div>
         {order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" && <FinalPriceAction orderId={order.id} />}
