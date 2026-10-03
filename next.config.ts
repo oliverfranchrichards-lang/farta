@@ -5,7 +5,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   allowedDevOrigins: ['chastity-judgingly-petted.ngrok-free.dev'],
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: 'thumb.wikimedia.org' }],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'thumb.wikimedia.org' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: '**.supabase.co' },
+    ],
   },
   async headers() {
     const securityHeaders = [

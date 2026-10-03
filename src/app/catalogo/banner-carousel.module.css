@@ -1,0 +1,15 @@
+.region { display: grid; gap: 10px; margin: 24px 0; }
+.slide { position: relative; display: grid; min-height: 220px; overflow: hidden; isolation: isolate; align-items: center; padding: 28px 32px; color: #fff; background: var(--farta-color-brand-primary); border-radius: 16px; }
+.copy { position: relative; z-index: 1; max-width: 48%; }
+.copy h2 { margin: 0 0 8px; font: var(--farta-type-h2); color: #fff; }
+.copy p { margin: 0; color: rgba(255, 255, 255, .9); font: var(--farta-type-body); }
+.image, .imageFallback { position: absolute; z-index: -1; inset: 0 0 0 auto; width: 58%; height: 100%; object-fit: cover; }
+.image { opacity: .78; mix-blend-mode: screen; }
+.imageFallback { background: var(--farta-color-brand-primary); }
+.controls { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.controls button { min-width: 44px; min-height: 44px; }
+.dots { display: flex; align-items: center; gap: 8px; }
+.dot, .dotActive { width: 12px; min-width: 12px !important; height: 12px; min-height: 12px !important; padding: 0; border: 0; border-radius: 50%; background: var(--farta-color-border-strong); cursor: pointer; }
+.dotActive { background: var(--farta-color-brand-primary); box-shadow: 0 0 0 3px var(--farta-color-success-soft); }
+@media (prefers-reduced-motion: reduce) { .image { transition: none; } }
+@media (max-width: 700px) { .slide { min-height: 190px; padding: 22px 20px; } .copy { max-width: 70%; } .copy h2 { font-size: 24px; line-height: 30px; } .copy p { font-size: 14px; } .image { width: 52%; opacity: .55; } }

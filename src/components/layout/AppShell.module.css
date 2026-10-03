@@ -13,6 +13,8 @@
 .actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .notificationLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
 .notificationLink:hover { background: var(--farta-color-surface-secondary); }
+.profileLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
+.profileLink:hover { background: var(--farta-color-surface-secondary); }
 .actions button { min-height: 44px; padding: 0 16px; color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-default); border-radius: var(--farta-radius-control); font: var(--farta-type-label); cursor: pointer; }
 .actions button:hover:not(:disabled) { background: var(--farta-color-surface-secondary); }
 .actions button:disabled { opacity: .6; cursor: wait; }
@@ -34,7 +36,7 @@
   .mobileBrand img { width: 40px; height: 40px; object-fit: contain; }
   .workspaceLabel { display: none; }
   .actions { gap: 4px; }
-  .notificationLink { padding-inline: 6px; font-size: 13px; }
+  .notificationLink, .profileLink { padding-inline: 6px; font-size: 13px; }
   .actions button { padding-inline: 10px; }
   .content { min-height: calc(100svh - 64px); padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 }

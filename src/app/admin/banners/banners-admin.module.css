@@ -1,0 +1,23 @@
+.page { max-width: 1240px; margin: 0 auto; padding: 32px; }
+.breadcrumb { margin-bottom: 18px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.breadcrumb a { color: var(--farta-color-brand-primary); }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+.header h1 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h1); }
+.header p, .hint { color: var(--farta-color-text-secondary); }
+.notice, .error { margin-bottom: 16px; padding: 12px 16px; border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.notice { color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border: 1px solid var(--farta-color-success); }
+.error { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); border: 1px solid var(--farta-color-danger); }
+.formCard, .bannerCard { max-width: 820px; padding: 24px; }
+.form { display: grid; gap: 16px; }
+.form h2, .list h2 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
+.field { display: grid; gap: 6px; color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.field input, .field select { width: 100%; min-height: 48px; padding: 10px 12px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.field input:focus-visible, .field select:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.formActions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; }
+.list { display: grid; gap: 12px; margin-top: 28px; }
+.count { display: inline-flex; min-width: 28px; min-height: 28px; align-items: center; justify-content: center; padding: 0 8px; border-radius: 999px; background: var(--farta-color-success-soft); font: var(--farta-type-label); }
+.bannerCard { display: grid; grid-template-columns: minmax(180px, 280px) 1fr; gap: 24px; }
+.preview { display: grid; min-height: 150px; place-items: center; overflow: hidden; background: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); color: #fff; text-align: center; }
+.preview img { width: 100%; height: 100%; min-height: 150px; object-fit: cover; }
+.empty { padding: 40px 24px; text-align: center; }
+@media (max-width: 760px) { .page { padding: 24px 16px 56px; } .header { align-items: flex-start; flex-direction: column; } .header a { width: 100%; } .header a button { width: 100%; } .bannerCard { grid-template-columns: 1fr; } .formActions { flex-direction: column-reverse; } .formActions > * { width: 100%; } }

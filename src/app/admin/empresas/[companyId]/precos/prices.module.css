@@ -1,0 +1,35 @@
+.panel { margin-bottom: 22px; padding: 22px 24px; }
+.toolbar { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.toolbar h2 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
+.toolbar p { margin: 6px 0 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.search { display: grid; gap: 6px; min-width: 290px; color: var(--farta-color-text-secondary); font: var(--farta-type-label); }
+.search input, .field input { min-height: 46px; padding: 0 12px; border: var(--farta-border-default); border-radius: var(--farta-radius-control); color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); font: inherit; }
+.tableWrap { overflow-x: auto; border: var(--farta-border-default); border-radius: var(--farta-radius-card); background: var(--farta-color-surface-primary); }
+.table { width: 100%; border-collapse: collapse; min-width: 860px; }
+.table th, .table td { padding: 16px; border-bottom: var(--farta-border-default); text-align: left; vertical-align: middle; }
+.table th { color: var(--farta-color-text-secondary); font: var(--farta-type-caption); text-transform: uppercase; letter-spacing: .04em; }
+.table td { color: var(--farta-color-text-primary); font: var(--farta-type-body-sm); }
+.table td strong, .table td small { display: block; }
+.table td small { margin-top: 4px; color: var(--farta-color-text-secondary); }
+.active, .inactive, .missing { display: inline-flex; padding: 6px 9px; border-radius: var(--farta-radius-pill); font: var(--farta-type-caption); }
+.active { color: var(--farta-color-success); background: var(--farta-color-success-soft); }
+.inactive { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); }
+.missing { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
+.empty { padding: 42px 28px; text-align: center; }
+.empty h2 { margin: 0 0 8px; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
+.empty p { margin: 0; color: var(--farta-color-text-secondary); }
+.notice, .error { margin-bottom: 16px; padding: 13px 16px; border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.notice { color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border: 1px solid var(--farta-color-success); }
+.error { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); border: 1px solid var(--farta-color-danger); }
+.overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgb(20 35 29 / 35%); }
+.dialog { width: min(100%, 470px); margin: 0; padding: 26px; border: 0; border-radius: var(--farta-radius-card); background: var(--farta-color-surface-primary); color: var(--farta-color-text-primary); box-shadow: 0 18px 70px rgb(20 35 29 / 22%); }
+.dialog h2 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h2); }
+.dialog p { color: var(--farta-color-text-secondary); }
+.dialog dl { display: grid; gap: 10px; margin: 18px 0; }
+.dialog dl div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: var(--farta-border-default); }
+.dialog dt { color: var(--farta-color-text-secondary); }
+.dialog dd { margin: 0; font-weight: 700; }
+.field { display: grid; gap: 8px; color: var(--farta-color-text-secondary); font: var(--farta-type-label); }
+.dialogActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 760px) { .toolbar { align-items: stretch; flex-direction: column; } .search { min-width: 0; } .tableWrap { border: 0; background: transparent; } .table { min-width: 0; } .table thead { display: none; } .table, .table tbody, .table tr, .table td { display: block; width: 100%; } .table tr { margin-bottom: 16px; padding: 16px; border: var(--farta-border-default); border-radius: var(--farta-radius-card); background: var(--farta-color-surface-primary); } .table td { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border: 0; } .table td::before { content: attr(data-label); color: var(--farta-color-text-secondary); } .table td:last-child { padding-top: 14px; } .table td:last-child button { width: 100%; } }

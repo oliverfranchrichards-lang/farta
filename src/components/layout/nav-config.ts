@@ -6,14 +6,18 @@ export const navByProfile: Record<NavProfile, NavItem[]> = {
     { href: "/", label: "Início", icon: "home" },
     { href: "/catalogo", label: "Comprar", icon: "catalog" },
     { href: "/pedidos", label: "Pedidos", icon: "orders" },
+    { href: "/mensagens", label: "Mensagens", icon: "support" },
   ],
   INTERNAL_OPERATOR: [
     { href: "/", label: "Visão geral", icon: "home" },
     { href: "/operacao/pedidos", label: "Pedidos", icon: "orders" },
+    { href: "/mensagens", label: "Mensagens", icon: "support" },
   ],
-  DRIVER: [{ href: "/operacao/entregas", label: "Entregas", icon: "delivery" }],
+  DRIVER: [{ href: "/operacao/entregas", label: "Entregas", icon: "delivery" }, { href: "/mensagens", label: "Mensagens", icon: "support" }],
   PLATFORM_ADMIN: [
     { href: "/admin/empresas", label: "Empresas", icon: "home" },
+    { href: "/admin/produtos", label: "Produtos", icon: "inventory" },
+    { href: "/admin/banners", label: "Banners", icon: "support" },
     { href: "/admin/pedidos", label: "Pedidos", icon: "orders" },
   ],
 };

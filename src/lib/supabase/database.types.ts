@@ -155,6 +155,45 @@ export type Database = {
           },
         ]
       }
+      banners: {
+        Row: {
+          alt_text: string
+          byte_size: number
+          created_at: string
+          id: string
+          mime_type: string
+          sort_order: number
+          status: string
+          storage_object_path: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          alt_text: string
+          byte_size: number
+          created_at?: string
+          id?: string
+          mime_type: string
+          sort_order?: number
+          status?: string
+          storage_object_path: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          byte_size?: number
+          created_at?: string
+          id?: string
+          mime_type?: string
+          sort_order?: number
+          status?: string
+          storage_object_path?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -485,6 +524,98 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          company_id: string
+          conversation_id: string
+          created_at: string
+          profile_id: string
+        }
+        Insert: {
+          company_id: string
+          conversation_id: string
+          created_at?: string
+          profile_id: string
+        }
+        Update: {
+          company_id?: string
+          conversation_id?: string
+          created_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_conversation_id_company_id_fkey"
+            columns: ["conversation_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by_profile_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by_profile_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by_profile_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_created_by_profile_id_fkey"
+            columns: ["created_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1024,6 +1155,45 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_profile_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender_profile_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string
@@ -1070,36 +1240,54 @@ export type Database = {
       }
       order_items: {
         Row: {
+          approximate_subtotal_minor: number | null
+          approximate_unit_price_minor: number | null
           created_at: string
           currency_code: string
+          final_subtotal_minor: number | null
+          final_unit_price_minor: number | null
           id: string
+          minimum_quantity_snapshot: number
           order_id: string
           quantity: number
           sale_unit_snapshot: string
+          sku_code_snapshot: string
           sku_id: string
           sku_name_snapshot: string
           subtotal_minor: number
           unit_price_minor: number
         }
         Insert: {
+          approximate_subtotal_minor?: number | null
+          approximate_unit_price_minor?: number | null
           created_at?: string
           currency_code?: string
+          final_subtotal_minor?: number | null
+          final_unit_price_minor?: number | null
           id?: string
+          minimum_quantity_snapshot?: number
           order_id: string
           quantity: number
           sale_unit_snapshot: string
+          sku_code_snapshot: string
           sku_id: string
           sku_name_snapshot: string
           subtotal_minor: number
           unit_price_minor: number
         }
         Update: {
+          approximate_subtotal_minor?: number | null
+          approximate_unit_price_minor?: number | null
           created_at?: string
           currency_code?: string
+          final_subtotal_minor?: number | null
+          final_unit_price_minor?: number | null
           id?: string
+          minimum_quantity_snapshot?: number
           order_id?: string
           quantity?: number
           sale_unit_snapshot?: string
+          sku_code_snapshot?: string
           sku_id?: string
           sku_name_snapshot?: string
           subtotal_minor?: number
@@ -1118,6 +1306,67 @@ export type Database = {
             columns: ["sku_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_price_history: {
+        Row: {
+          approximate_unit_price_minor: number
+          changed_at: string
+          changed_by_profile_id: string
+          correlation_id: string | null
+          final_unit_price_minor: number
+          id: string
+          order_id: string
+          order_item_id: string
+          previous_final_unit_price_minor: number | null
+          reason: string | null
+        }
+        Insert: {
+          approximate_unit_price_minor: number
+          changed_at?: string
+          changed_by_profile_id: string
+          correlation_id?: string | null
+          final_unit_price_minor: number
+          id?: string
+          order_id: string
+          order_item_id: string
+          previous_final_unit_price_minor?: number | null
+          reason?: string | null
+        }
+        Update: {
+          approximate_unit_price_minor?: number
+          changed_at?: string
+          changed_by_profile_id?: string
+          correlation_id?: string | null
+          final_unit_price_minor?: number
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          previous_final_unit_price_minor?: number | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_price_history_changed_by_profile_id_fkey"
+            columns: ["changed_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_price_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_price_history_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
             referencedColumns: ["id"]
           },
         ]
@@ -1173,6 +1422,8 @@ export type Database = {
       orders: {
         Row: {
           address_snapshot: Json
+          approximate_subtotal_minor: number | null
+          approximate_total_minor: number | null
           cancelled_at: string | null
           cart_id: string
           company_id: string
@@ -1183,17 +1434,23 @@ export type Database = {
           currency_code: string
           delivery_fee_minor: number
           establishment_id: string
+          final_confirmed_at: string | null
+          final_subtotal_minor: number | null
+          final_total_minor: number | null
           id: string
           inventory_location_id: string
           order_number: number
           requested_window: Json | null
           status: string
+          submitted_for_review_at: string | null
           subtotal_minor: number
           total_minor: number
           updated_at: string
         }
         Insert: {
           address_snapshot: Json
+          approximate_subtotal_minor?: number | null
+          approximate_total_minor?: number | null
           cancelled_at?: string | null
           cart_id: string
           company_id: string
@@ -1204,17 +1461,23 @@ export type Database = {
           currency_code?: string
           delivery_fee_minor?: number
           establishment_id: string
+          final_confirmed_at?: string | null
+          final_subtotal_minor?: number | null
+          final_total_minor?: number | null
           id?: string
           inventory_location_id: string
           order_number?: number
           requested_window?: Json | null
           status?: string
+          submitted_for_review_at?: string | null
           subtotal_minor: number
           total_minor: number
           updated_at?: string
         }
         Update: {
           address_snapshot?: Json
+          approximate_subtotal_minor?: number | null
+          approximate_total_minor?: number | null
           cancelled_at?: string | null
           cart_id?: string
           company_id?: string
@@ -1225,11 +1488,15 @@ export type Database = {
           currency_code?: string
           delivery_fee_minor?: number
           establishment_id?: string
+          final_confirmed_at?: string | null
+          final_subtotal_minor?: number | null
+          final_total_minor?: number | null
           id?: string
           inventory_location_id?: string
           order_number?: number
           requested_window?: Json | null
           status?: string
+          submitted_for_review_at?: string | null
           subtotal_minor?: number
           total_minor?: number
           updated_at?: string
@@ -1388,6 +1655,7 @@ export type Database = {
           attributes: Json
           created_at: string
           id: string
+          minimum_quantity: number
           name: string
           product_id: string
           sale_unit: string
@@ -1399,6 +1667,7 @@ export type Database = {
           attributes?: Json
           created_at?: string
           id?: string
+          minimum_quantity: number
           name: string
           product_id: string
           sale_unit: string
@@ -1410,6 +1679,7 @@ export type Database = {
           attributes?: Json
           created_at?: string
           id?: string
+          minimum_quantity?: number
           name?: string
           product_id?: string
           sale_unit?: string
@@ -1704,7 +1974,153 @@ export type Database = {
           quantity: number
         }[]
       }
+      admin_create_banner: {
+        Args: {
+          p_alt_text: string
+          p_byte_size: number
+          p_mime_type: string
+          p_sort_order?: number
+          p_status?: string
+          p_storage_object_path: string
+          p_title?: string
+        }
+        Returns: {
+          alt_text: string
+          byte_size: number
+          created_at: string
+          id: string
+          mime_type: string
+          sort_order: number
+          status: string
+          storage_object_path: string
+          title: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "banners"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_create_category: {
+        Args: { p_name: string; p_sort_order?: number }
+        Returns: {
+          id: string
+          name: string
+          sort_order: number
+          status: string
+        }[]
+      }
+      admin_create_product: {
+        Args: {
+          p_brand?: string
+          p_category_id: string
+          p_description?: string
+          p_name: string
+          p_status?: string
+        }
+        Returns: {
+          brand: string
+          category_id: string
+          description: string
+          id: string
+          name: string
+          status: string
+        }[]
+      }
+      admin_create_product_image: {
+        Args: {
+          p_alt_text: string
+          p_byte_size: number
+          p_is_primary?: boolean
+          p_mime_type: string
+          p_product_id: string
+          p_sort_order?: number
+          p_storage_object_path: string
+          p_variant_id: string
+        }
+        Returns: {
+          alt_text: string
+          byte_size: number
+          created_at: string
+          id: string
+          is_primary: boolean
+          mime_type: string
+          product_id: string | null
+          sort_order: number
+          storage_object_path: string
+          variant_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "product_images"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_create_variant: {
+        Args: {
+          p_attributes?: Json
+          p_minimum_quantity?: number
+          p_name: string
+          p_product_id: string
+          p_sale_unit: string
+          p_sku_code: string
+          p_status?: string
+        }
+        Returns: {
+          id: string
+          minimum_quantity: number
+          name: string
+          product_id: string
+          sale_unit: string
+          sku_code: string
+          status: string
+        }[]
+      }
+      admin_delete_category: {
+        Args: { p_category_id: string; p_confirm_reassign?: boolean }
+        Returns: boolean
+      }
+      admin_delete_product_image: {
+        Args: { p_image_id: string }
+        Returns: string
+      }
       admin_get_company: { Args: { p_company_id: string }; Returns: Json }
+      admin_get_or_create_other_category: { Args: never; Returns: string }
+      admin_list_banners: {
+        Args: never
+        Returns: {
+          alt_text: string
+          byte_size: number
+          created_at: string
+          id: string
+          mime_type: string
+          sort_order: number
+          status: string
+          storage_object_path: string
+          title: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "banners"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_list_categories: {
+        Args: { p_status?: string }
+        Returns: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }[]
+      }
       admin_list_companies: {
         Args: never
         Returns: {
@@ -1724,6 +2140,30 @@ export type Database = {
           invitation_id: string
           invited_email: string
           status: string
+        }[]
+      }
+      admin_list_company_prices: {
+        Args: { p_company_id: string }
+        Returns: {
+          amount_minor: number
+          brand: string
+          company_id: string
+          company_name: string
+          company_status: string
+          currency_code: string
+          minimum_quantity: number
+          price_id: string
+          price_status: string
+          product_id: string
+          product_name: string
+          product_status: string
+          sale_unit: string
+          sku_code: string
+          sku_id: string
+          sku_status: string
+          valid_from: string
+          valid_until: string
+          variant_name: string
         }[]
       }
       admin_list_establishments: {
@@ -1752,6 +2192,49 @@ export type Database = {
           units: number
         }[]
       }
+      admin_list_product_images: {
+        Args: { p_product_id?: string; p_variant_id?: string }
+        Returns: {
+          alt_text: string
+          byte_size: number
+          id: string
+          is_primary: boolean
+          mime_type: string
+          product_id: string
+          sort_order: number
+          storage_object_path: string
+          variant_id: string
+        }[]
+      }
+      admin_list_products: {
+        Args: { p_status?: string }
+        Returns: {
+          brand: string
+          category_id: string
+          category_name: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }[]
+      }
+      admin_list_variants: {
+        Args: { p_product_id: string }
+        Returns: {
+          attributes: Json
+          created_at: string
+          id: string
+          minimum_quantity: number
+          name: string
+          product_id: string
+          sale_unit: string
+          sku_code: string
+          status: string
+          updated_at: string
+        }[]
+      }
       admin_set_company_status: {
         Args: { p_company_id: string; p_status: string }
         Returns: boolean
@@ -1764,6 +2247,53 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: boolean
       }
+      admin_update_banner: {
+        Args: {
+          p_alt_text: string
+          p_banner_id: string
+          p_sort_order?: number
+          p_status?: string
+          p_title?: string
+        }
+        Returns: {
+          alt_text: string
+          byte_size: number
+          created_at: string
+          id: string
+          mime_type: string
+          sort_order: number
+          status: string
+          storage_object_path: string
+          title: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "banners"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_update_category:
+        | {
+            Args: {
+              p_category_id: string
+              p_name: string
+              p_sort_order: number
+              p_status: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_category_id: string
+              p_confirm_reassign?: boolean
+              p_name: string
+              p_sort_order: number
+              p_status: string
+            }
+            Returns: boolean
+          }
       admin_update_company: {
         Args: { p_company_id: string; p_data: Json }
         Returns: {
@@ -1771,6 +2301,50 @@ export type Database = {
           id: string
           status: string
         }[]
+      }
+      admin_update_product: {
+        Args: {
+          p_brand: string
+          p_category_id: string
+          p_description: string
+          p_name: string
+          p_product_id: string
+          p_status: string
+        }
+        Returns: boolean
+      }
+      admin_update_variant: {
+        Args: {
+          p_attributes: Json
+          p_minimum_quantity: number
+          p_name: string
+          p_sale_unit: string
+          p_sku_code: string
+          p_status: string
+          p_variant_id: string
+        }
+        Returns: boolean
+      }
+      admin_upsert_company_sku_price: {
+        Args: { p_amount_minor: number; p_company_id: string; p_sku_id: string }
+        Returns: {
+          amount_minor: number
+          company_id: string
+          currency_code: string
+          price_id: string
+          sku_id: string
+          status: string
+          valid_from: string
+          valid_until: string
+        }[]
+      }
+      admin_upsert_company_sku_prices: {
+        Args: {
+          p_amount_minor: number
+          p_company_ids: string[]
+          p_sku_id: string
+        }
+        Returns: number
       }
       advance_order_status: {
         Args: { p_order_id: string; p_to_status: string }
@@ -1780,14 +2354,15 @@ export type Database = {
         Args: { p_order_id: string; p_reason: string }
         Returns: boolean
       }
+      chat_shared_company: {
+        Args: { p_peer_profile_id: string }
+        Returns: string
+      }
       company_assign_order_driver: {
         Args: { p_driver_profile_id: string; p_order_id: string }
         Returns: boolean
       }
-      company_get_order_details: {
-        Args: { p_order_id: string }
-        Returns: Json
-      }
+      company_get_order_details: { Args: { p_order_id: string }; Returns: Json }
       company_list_drivers: {
         Args: never
         Returns: {
@@ -1836,6 +2411,10 @@ export type Database = {
           order_number: number
         }[]
       }
+      confirm_final_order_price: {
+        Args: { p_idempotency_key?: string; p_order_id: string }
+        Returns: boolean
+      }
       create_company: {
         Args: { p_company: Json }
         Returns: {
@@ -1869,6 +2448,23 @@ export type Database = {
               invitation_token: string
             }[]
           }
+      create_direct_conversation: {
+        Args: { p_peer_profile_id: string }
+        Returns: {
+          company_id: string
+          created_at: string
+          created_by_profile_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "conversations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_establishment: {
         Args: { p_address: Json; p_company_id: string; p_name: string }
         Returns: {
@@ -1899,9 +2495,47 @@ export type Database = {
         Args: { target_company_id: string }
         Returns: boolean
       }
+      list_direct_conversations: {
+        Args: never
+        Returns: {
+          company_id: string
+          id: string
+          last_message: string
+          last_message_at: string
+          peer_name: string
+          peer_profile_id: string
+          peer_role: string
+          status: string
+        }[]
+      }
+      list_direct_messages: {
+        Args: { p_conversation_id: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          sender_profile_id: string
+        }[]
+      }
       revoke_company_invitation: {
         Args: { p_invitation_id: string }
         Returns: boolean
+      }
+      send_direct_message: {
+        Args: { p_body: string; p_conversation_id: string }
+        Returns: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_profile_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_active_cart_item_quantity: {
         Args: { p_cart_id: string; p_quantity: number; p_sku_id: string }
@@ -1910,6 +2544,40 @@ export type Database = {
           quantity: number
         }[]
       }
+      set_order_final_prices: {
+        Args: {
+          p_idempotency_key?: string
+          p_items: Json
+          p_order_id: string
+          p_reason?: string
+        }
+        Returns: boolean
+      }
+      submit_order_for_review: {
+        Args: {
+          p_address_id: string
+          p_cart_id: string
+          p_idempotency_key?: string
+          p_window_label: string
+        }
+        Returns: {
+          order_id: string
+          order_number: number
+        }[]
+      }
+      submit_order_for_review_impl: {
+        Args: {
+          p_address_id: string
+          p_cart_id: string
+          p_idempotency_key?: string
+          p_window_label: string
+        }
+        Returns: {
+          order_id: string
+          order_number: number
+        }[]
+      }
+      update_my_profile_phone: { Args: { p_phone: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

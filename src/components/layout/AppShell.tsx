@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className={styles.header}>
         <Link className={styles.mobileBrand} href="/" aria-label="Farta, início"><Image src="/farta-logo.png" alt="" width={48} height={48} priority /><span>Farta</span></Link>
         <span className={styles.workspaceLabel}>Área de trabalho</span>
-        <div className={styles.actions}>{showCustomerNotifications && <Link className={styles.notificationLink} href="/notificacoes" aria-label="Abrir notificações">Notificações</Link>}<SignOutButton /></div>
+        <div className={styles.actions}>{showCustomerNotifications && <Link className={styles.notificationLink} href="/notificacoes" aria-label="Abrir notificações">Notificações</Link>}<Link className={styles.profileLink} href="/perfil">Meu perfil</Link><SignOutButton /></div>
       </header>
       <main id="main-content" className={styles.content}>{children}</main>
     </div>

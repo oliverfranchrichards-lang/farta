@@ -1,0 +1,18 @@
+.page { max-width: 1080px; margin: 0 auto; padding: 32px; }
+.grid { display: grid; grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr); gap: 20px; margin-top: 28px; }
+.summary { align-self: start; }
+.summary h2 { margin: 4px 0; font: var(--farta-type-h3); }
+.summary p:not(.eyebrow) { margin: 4px 0 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); overflow-wrap: anywhere; }
+.eyebrow { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-caption); letter-spacing: .08em; }
+.role { display: inline-flex; padding: 6px 10px; color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border-radius: var(--farta-radius-pill); font: var(--farta-type-caption); font-weight: 700; }
+.form { display: grid; gap: 18px; }
+.form h2 { margin: 4px 0; font: var(--farta-type-h3); }
+.help { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.field { display: grid; gap: 6px; color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.field input { min-height: 48px; padding: 0 14px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body); }
+.field input:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.field small { color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
+.notice, .error { padding: 12px 14px; border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.notice { color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border: 1px solid var(--farta-color-success); }
+.error { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); border: 1px solid var(--farta-color-danger); }
+@media (max-width: 639px) { .page { padding: 24px 16px; } .grid { grid-template-columns: 1fr; margin-top: 20px; } .form button { width: 100%; } }

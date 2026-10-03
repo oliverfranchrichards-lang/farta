@@ -7,9 +7,13 @@ import { getOrderDetails } from "@/modules/orders/order.actions";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { ReceiptAction } from "./receipt-action";
 import { CancelOrderAction } from "./cancel-action";
+import { FinalPriceAction } from "./final-price-action";
 import styles from "./order-detail.module.css";
 
 const labels: Record<string, string> = {
+  SUBMITTED_FOR_REVIEW: "Aguardando análise",
+  PRICED_AWAITING_CUSTOMER_CONFIRMATION: "Aguardando sua confirmação",
+  CUSTOMER_CONFIRMED: "Confirmado",
   CONFIRMED: "Confirmado",
   PICKING: "Em separação",
   READY_FOR_DISPATCH: "Pronto para envio",
@@ -24,7 +28,7 @@ const money = (minor: number) => (minor / 100).toLocaleString("pt-BR", { style: 
 function historyTone(status: string) {
   if (status === "DELIVERED" || status === "RECEIPT_CONFIRMED") return styles.historySuccess;
   if (status === "DISPATCHED" || status === "READY_FOR_DISPATCH") return styles.historyInfo;
-  if (status === "PICKING") return styles.historyWarning;
+  if (status === "PICKING" || status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION") return styles.historyWarning;
   if (status === "CANCELLED") return styles.historyDanger;
   return "";
 }
@@ -37,7 +41,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ o
   const result = await getOrderDetails(orderId);
   if (!result.ok) notFound();
   const { order } = result;
-  const tone = order.status === "CANCELLED" ? "error" : order.status === "DELIVERED" || order.status === "RECEIPT_CONFIRMED" ? "success" : order.status === "PICKING" ? "warning" : order.status === "DISPATCHED" || order.status === "READY_FOR_DISPATCH" ? "info" : "default";
+  const tone = order.status === "CANCELLED" ? "error" : order.status === "DELIVERED" || order.status === "RECEIPT_CONFIRMED" || order.status === "CUSTOMER_CONFIRMED" ? "success" : order.status === "PICKING" || order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" ? "warning" : order.status === "DISPATCHED" || order.status === "READY_FOR_DISPATCH" ? "info" : "default";
 
   return <main className={styles.page}>
     <Link className={styles.backLink} href="/pedidos">← Voltar para meus pedidos</Link>
@@ -46,9 +50,10 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ o
       <Card className={styles.summary}>
         <h2>Resumo</h2>
         <dl><div><dt>Entrega</dt><dd>{order.delivery}</dd></div><div><dt>Endereço</dt><dd>{order.address}</dd></div></dl>
-        <div className={styles.total}><span>Total</span><strong>{money(order.totalMinor)}</strong></div>
+        <div className={styles.total}><span>{order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" ? "Total final" : "Total"}</span><strong>{money(order.totalMinor)}</strong></div>
+        {order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" && <FinalPriceAction orderId={order.id} />}
         {order.status === "DELIVERED" && <ReceiptAction orderId={order.id} />}
-        {order.status === "CONFIRMED" && <CancelOrderAction orderId={order.id} />}
+        {(order.status === "CONFIRMED" || order.status === "CUSTOMER_CONFIRMED") && <CancelOrderAction orderId={order.id} />}
         {order.status === "PICKING" && <p className={styles.helper}>Este pedido já entrou em separação e não pode ser cancelado.</p>}
       </Card>
       <Card className={styles.items}>

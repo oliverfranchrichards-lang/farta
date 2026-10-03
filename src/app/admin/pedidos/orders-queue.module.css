@@ -31,6 +31,13 @@
 .drawerHeader h2 { margin: 0; color: var(--farta-color-text-primary); font: var(--farta-type-h2); }
 .close { width: 44px; height: 44px; border: 0; border-radius: var(--farta-radius-control); color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); font-size: 26px; cursor: pointer; }
 .drawerMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.contact { display: grid; gap: 8px; padding: 16px; background: var(--farta-color-surface-secondary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
+.contact h3 { margin: 0; }
+.contactName { color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.contactPhone { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.whatsappLink { display: inline-flex; align-items: center; justify-content: center; width: fit-content; min-height: 44px; padding: 0 14px; color: #fff; background: #168a51; border-radius: var(--farta-radius-control); font: var(--farta-type-label); text-decoration: none; }
+.whatsappLink:hover { background: #0f7041; }
+.contactUnavailable { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .detailHint { margin: 0; padding: 12px 14px; color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
 .drawer h3 { margin: 4px 0 -6px; color: var(--farta-color-text-primary); font: var(--farta-type-h3); }
 .detailItems { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -42,6 +49,13 @@
 .detailTotals { display: grid; gap: 8px; padding: 16px; color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
 .detailTotals span { display: flex; justify-content: space-between; gap: 16px; }
 .detailTotals strong { color: var(--farta-color-text-primary); }
+.priceReview { display: grid; gap: 12px; padding: 16px; background: var(--farta-color-surface-secondary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
+.priceReview h3 { margin: 0; }
+.priceFields { display: grid; gap: 12px; }
+.priceFields label, .reasonField { display: grid; gap: 6px; color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.priceFields input, .reasonField textarea { min-height: 44px; padding: 10px 12px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.priceFields small { color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
+.reasonField textarea { resize: vertical; }
 .drawerActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 12px; }
 .downloadButton { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-label); text-decoration: none; }
 .dispatchAction select { width: 100%; min-width: 160px; }
@@ -51,4 +65,4 @@
 .mobileList { display: none; }
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 1099px) { .tableWrap { display: none; } .mobileList { display: grid; gap: 12px; padding: 20px; } .mobileCard { display: grid; gap: 8px; padding: 18px; } .mobileCard p { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); } .mobileCard > strong { font: 700 20px/28px "Gilroy", Arial, sans-serif; } .mobileTitle { display: flex; align-items: center; justify-content: space-between; gap: 12px; } .mobileCard button { width: 100%; } .mobileCard .rowActions button { width: auto; } }
-@media (max-width: 639px) { .page { padding: 24px 16px; } .header h1 { font-size: 30px; line-height: 36px; } .summary { grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; } .summary article { grid-template-columns: 52px 1fr; align-items: center; padding: 12px 16px; } .summary strong { font-size: 28px; line-height: 32px; } .toolbar { grid-template-columns: 1fr; padding: 16px; } .mobileList { padding: 16px; } .drawer { width: 100%; padding: 22px 18px; } .drawerActions { flex-direction: column; } .drawerActions button { width: 100%; } }
+@media (max-width: 639px) { .page { padding: 24px 16px; } .header h1 { font-size: 30px; line-height: 36px; } .summary { grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; } .summary article { grid-template-columns: 52px 1fr; align-items: center; padding: 12px 16px; } .summary strong { font-size: 28px; line-height: 32px; } .toolbar { grid-template-columns: 1fr; padding: 16px; } .mobileList { padding: 16px; } .drawer { width: 100%; padding: 22px 18px; } .drawerActions { flex-direction: column; } .drawerActions button, .whatsappLink { width: 100%; } }

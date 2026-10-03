@@ -5,10 +5,14 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { advanceOrderStatus, assignCompanyOrderDriver, getCompanyOrderDetails, listAdminOrders, listCompanyDrivers, listCompanyOrders, startCompanyOrderPicking, startOrderPicking, type AdminOrder, type CompanyDriver, type CompanyOrderDetails } from '@/modules/admin/admin.actions';
+import { advanceOrderStatus, assignCompanyOrderDriver, getCompanyOrderDetails, listAdminOrders, listCompanyDrivers, listCompanyOrders, setOrderFinalPrices, startCompanyOrderPicking, startOrderPicking, type AdminOrder, type CompanyDriver, type CompanyOrderDetails } from '@/modules/admin/admin.actions';
+import { formatBrazilPhone, whatsappUrl } from '@/lib/contact/phone';
 import styles from './orders-queue.module.css';
 
 const labels: Record<string, string> = {
+  SUBMITTED_FOR_REVIEW: 'Aguardando análise',
+  PRICED_AWAITING_CUSTOMER_CONFIRMATION: 'Aguardando cliente',
+  CUSTOMER_CONFIRMED: 'Confirmado',
   CONFIRMED: 'Confirmado',
   PICKING: 'Em separação',
   READY_FOR_DISPATCH: 'Pronto para envio',
@@ -21,7 +25,7 @@ const labels: Record<string, string> = {
 const tone = (status: string) => {
   if (status === 'CANCELLED') return 'error' as const;
   if (status === 'DELIVERED' || status === 'RECEIPT_CONFIRMED') return 'success' as const;
-  if (status === 'PICKING') return 'warning' as const;
+  if (status === 'PICKING' || status === 'PRICED_AWAITING_CUSTOMER_CONFIRMATION') return 'warning' as const;
   if (status === 'READY_FOR_DISPATCH' || status === 'DISPATCHED') return 'info' as const;
   return 'default' as const;
 };
@@ -41,23 +45,50 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, string>>({});
   const [detailOrder, setDetailOrder] = useState<CompanyOrderDetails | null>(null);
   const [detailBusy, setDetailBusy] = useState(false);
+  const [finalPriceValues, setFinalPriceValues] = useState<Record<string, string>>({});
+  const [finalPriceReason, setFinalPriceReason] = useState('');
   const closeDetailRef = useRef<HTMLButtonElement>(null);
+  const detailTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!detailOrder) return;
     closeDetailRef.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setDetailOrder(null); };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeDetails();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const dialog = closeDetailRef.current?.closest('[role="dialog"]');
+      if (!dialog) return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])')).filter((element) => !element.hasAttribute('disabled'));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
     window.addEventListener('keydown', closeOnEscape);
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [detailOrder]);
 
-  async function openDetails(orderId: string) {
+  async function openDetails(orderId: string, trigger?: HTMLButtonElement) {
+    detailTriggerRef.current = trigger ?? null;
     setDetailBusy(true);
     setNotice('');
     const result = await getCompanyOrderDetails(orderId);
-    if (result.ok) setDetailOrder(result.order);
+    if (result.ok) {
+      setDetailOrder(result.order);
+      setFinalPriceValues(Object.fromEntries(result.order.items.map((item) => [item.skuId, ((item.finalUnitPriceMinor ?? item.approximateUnitPriceMinor ?? item.unitPriceMinor) / 100).toFixed(2)])));
+      setFinalPriceReason('');
+    }
     else setNotice(result.message);
     setDetailBusy(false);
+  }
+
+  function closeDetails() {
+    setDetailOrder(null);
+    detailTriggerRef.current?.focus();
   }
 
   useEffect(() => {
@@ -131,6 +162,32 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
     setBusy('');
   }
 
+  async function saveFinalPrices() {
+    if (!detailOrder) return;
+    const invalidPrice = detailOrder.items.some((item) => {
+      const value = finalPriceValues[item.skuId]?.trim().replace(',', '.') ?? '';
+      const parsed = Number(value);
+      return value === '' || !Number.isFinite(parsed) || parsed < 0;
+    });
+    if (invalidPrice) {
+      setNotice('Informe um preço final válido para cada item.');
+      return;
+    }
+    setDetailBusy(true);
+    setNotice('');
+    const items = detailOrder.items.map((item) => ({ skuId: item.skuId, unitPriceMinor: Math.round(Number(finalPriceValues[item.skuId].replace(',', '.')) * 100) }));
+    const result = await setOrderFinalPrices(detailOrder.id, items, finalPriceReason);
+    if (!result.ok) {
+      setNotice(result.message);
+      setDetailBusy(false);
+      return;
+    }
+    setNotice('Preços finais salvos. O cliente já pode revisar o pedido.');
+    closeDetails();
+    await refresh();
+    setDetailBusy(false);
+  }
+
   const action = (order: AdminOrder) => scope === 'driver' && order.status === 'DISPATCHED' ? (
     <Button type="button" onClick={() => void advance(order, 'DELIVERED')} disabled={busy === order.id}>{busy === order.id ? 'Confirmando…' : 'Confirmar entrega'}</Button>
   ) : scope === 'company' && order.status === 'PICKING' ? (
@@ -150,7 +207,7 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
         {busy === order.id ? 'Atualizando…' : 'Enviar para rota'}
       </Button>
     </div>
-  ) : order.status === 'CONFIRMED' && scope !== 'driver' ? (
+  ) : (order.status === 'CONFIRMED' || order.status === 'CUSTOMER_CONFIRMED') && scope !== 'driver' ? (
     <Button type="button" onClick={() => void start(order)} disabled={busy === order.id}>
       {busy === order.id ? 'Iniciando…' : 'Iniciar separação'}
     </Button>
@@ -161,7 +218,7 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
       <header className={styles.header}>
         <div className={styles.eyebrow}>OPERAÇÃO</div>
         <h1>Fila de pedidos</h1>
-        <p>Monitore pedidos confirmados e conduza a separação da operação.</p>
+        <p>Monitore pedidos em análise e conduza a separação da operação.</p>
       </header>
 
       <section className={styles.summary} aria-label="Resumo da fila">
@@ -193,12 +250,12 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <caption className={styles.visuallyHidden}>Fila operacional de pedidos</caption>
-              <thead><tr><th>Pedido</th><th>Empresa</th><th>Estabelecimento</th><th>Data</th><th>Itens</th><th>Total</th><th>Status</th><th>Ação</th></tr></thead>
+              <thead><tr><th scope="col">Pedido</th><th scope="col">Empresa</th><th scope="col">Estabelecimento</th><th scope="col">Data</th><th scope="col">Itens</th><th scope="col">Total</th><th scope="col">Status</th><th scope="col">Ação</th></tr></thead>
               <tbody>{visible.map((order) => (
                 <tr key={order.id}>
                   <td><strong>#{order.order_number}</strong></td><td>{order.company_name}</td><td>{order.establishment_name}</td>
                   <td>{new Date(order.created_at).toLocaleString('pt-BR')}</td><td>{order.units}</td><td>{money(order.total_minor)}</td>
-                  <td><Badge tone={tone(order.status)}>{labels[order.status] ?? order.status}</Badge></td><td><div className={styles.rowActions}><Button type="button" variant="secondary" onClick={() => void openDetails(order.id)} disabled={detailBusy}>Ver detalhes</Button>{action(order)}</div></td>
+                  <td><Badge tone={tone(order.status)}>{labels[order.status] ?? order.status}</Badge></td><td><div className={styles.rowActions}><Button type="button" variant="secondary" onClick={(event) => void openDetails(order.id, event.currentTarget)} disabled={detailBusy}>Ver detalhes</Button>{action(order)}</div></td>
                 </tr>
               ))}</tbody>
             </table>
@@ -212,20 +269,39 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
               <p>{order.company_name} · {order.establishment_name}</p>
               <p>{new Date(order.created_at).toLocaleString('pt-BR')} · {order.units} itens</p>
               <strong>{money(order.total_minor)}</strong>
-              <div className={styles.rowActions}><Button type="button" variant="secondary" onClick={() => void openDetails(order.id)} disabled={detailBusy}>Ver detalhes</Button>{(scope !== 'driver' || order.status === 'DISPATCHED') && action(order)}</div>
+              <div className={styles.rowActions}><Button type="button" variant="secondary" onClick={(event) => void openDetails(order.id, event.currentTarget)} disabled={detailBusy}>Ver detalhes</Button>{(scope !== 'driver' || order.status === 'DISPATCHED') && action(order)}</div>
             </Card>
           ))}
         </div>
       </Card>
-      {detailOrder && <div className={styles.overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDetailOrder(null); }}>
+      {detailOrder && <div className={styles.overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeDetails(); }}>
         <aside className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby="order-detail-title" aria-describedby="order-detail-context">
-          <div className={styles.drawerHeader}><div><p className={styles.eyebrow}>DETALHES DO PEDIDO</p><h2 id="order-detail-title">Pedido #{detailOrder.orderNumber}</h2></div><button ref={closeDetailRef} className={styles.close} type="button" onClick={() => setDetailOrder(null)} aria-label="Fechar detalhes">×</button></div>
+          <div className={styles.drawerHeader}><div><p className={styles.eyebrow}>DETALHES DO PEDIDO</p><h2 id="order-detail-title">Pedido #{detailOrder.orderNumber}</h2></div><button ref={closeDetailRef} className={styles.close} type="button" onClick={closeDetails} aria-label="Fechar detalhes">×</button></div>
           <div className={styles.drawerMeta} id="order-detail-context"><Badge tone={tone(detailOrder.status)}>{labels[detailOrder.status] ?? detailOrder.status}</Badge><span>{detailOrder.companyName} · {detailOrder.establishmentName}</span><span>{new Date(detailOrder.createdAt).toLocaleString('pt-BR')}</span></div>
+          <section className={styles.contact} aria-labelledby="order-contact-title">
+            <h3 id="order-contact-title">Contato do cliente</h3>
+            <span className={styles.contactName}>{detailOrder.customer?.name || 'Cliente'}</span>
+            {formatBrazilPhone(detailOrder.customer?.phone) && whatsappUrl(detailOrder.customer?.phone) ? <>
+              <span className={styles.contactPhone}>{formatBrazilPhone(detailOrder.customer?.phone)}</span>
+              <a className={styles.whatsappLink} href={whatsappUrl(detailOrder.customer?.phone) ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={`Conversar pelo WhatsApp com ${detailOrder.customer?.name || 'cliente'} (abre em nova aba)`}>Conversar pelo WhatsApp (abre em nova aba)</a>
+            </> : <p className={styles.contactUnavailable}>Telefone não informado ou indisponível para contato.</p>}
+          </section>
           {detailOrder.status === 'CONFIRMED' && <p className={styles.detailHint}>Confira os itens antes de iniciar a separação.</p>}
+          {detailOrder.status === 'SUBMITTED_FOR_REVIEW' && <section className={styles.priceReview} aria-labelledby="price-review-title">
+            <h3 id="price-review-title">Definir preços finais</h3>
+            <p className={styles.detailHint}>Informe o preço final por unidade comercial. O preço estimado permanece preservado no histórico.</p>
+            <div className={styles.priceFields}>{detailOrder.items.map((item) => <label key={item.id}>
+              <span>{item.productName} · {item.variantName} ({item.unit})</span>
+              <input type="number" min="0" step="0.01" inputMode="decimal" aria-label={`Preço final de ${item.productName}`} value={finalPriceValues[item.skuId] ?? ''} onChange={(event) => setFinalPriceValues((current) => ({ ...current, [item.skuId]: event.target.value }))} />
+              <small>Preço por unidade em reais</small>
+            </label>)}</div>
+            <label className={styles.reasonField}><span>Observação (opcional)</span><textarea rows={2} value={finalPriceReason} onChange={(event) => setFinalPriceReason(event.target.value)} maxLength={500} /></label>
+            <Button type="button" onClick={() => void saveFinalPrices()} disabled={detailBusy}>{detailBusy ? 'Salvando…' : 'Salvar preços finais'}</Button>
+          </section>}
           <h3>Itens do pedido</h3>
           <ul className={styles.detailItems}>{detailOrder.items.map(item => <li className={styles.detailItem} key={item.id}><div><strong>{item.productName}</strong><span>{item.brand ? `${item.brand} · ` : ''}{item.variantName} · {item.unit}</span>{item.skuCode && <small>SKU {item.skuCode}</small>}</div><div className={styles.detailNumbers}><strong>{item.quantity}×</strong><span>{money(item.subtotalMinor)}</span></div></li>)}</ul>
           <div className={styles.detailTotals}><span>Total de unidades <strong>{detailOrder.items.reduce((sum, item) => sum + item.quantity, 0)}</strong></span><span>Total <strong>{money(detailOrder.totalMinor)}</strong></span></div>
-          <div className={styles.drawerActions}>{detailOrder.status === 'CONFIRMED' && <Button type="button" onClick={() => { const order = orders.find(item => item.id === detailOrder.id); if (order) void start(order); setDetailOrder(null); }}>Iniciar separação</Button>}{scope !== 'driver' && <><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=xlsx`}>Baixar Excel</a><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=pdf`}>Baixar PDF</a></>}<Button type="button" variant="secondary" onClick={() => setDetailOrder(null)}>Fechar</Button></div>
+          <div className={styles.drawerActions}>{(detailOrder.status === 'CONFIRMED' || detailOrder.status === 'CUSTOMER_CONFIRMED') && <Button type="button" onClick={() => { const order = orders.find(item => item.id === detailOrder.id); if (order) void start(order); closeDetails(); }}>Iniciar separação</Button>}{scope !== 'driver' && <><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=xlsx`}>Baixar Excel</a><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=pdf`}>Baixar PDF</a></>}{<Button type="button" variant="secondary" onClick={closeDetails}>Fechar</Button>}</div>
         </aside>
       </div>}
     </main>
