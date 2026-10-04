@@ -32,7 +32,7 @@ export function InviteForm({ companyId }: { companyId: string }) {
 
   return (
     <Card className={styles.card}>
-      <form onSubmit={submit} aria-busy={loading}>
+      <form className={styles.inviteForm} onSubmit={submit} aria-busy={loading}>
         {(error || message) && <div ref={noticeRef} tabIndex={-1} className={error ? styles.feedback : styles.success} role={error ? 'alert' : 'status'} aria-live="polite">{error || message}</div>}
         {inviteLink && <Input id="invite-link" label="Link do convite" value={inviteLink} readOnly />}
         <Input id="invite-email" label="E-mail do convidado" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />

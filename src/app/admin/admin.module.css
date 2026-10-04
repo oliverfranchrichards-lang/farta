@@ -40,6 +40,9 @@
 .statusRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; padding-bottom: 22px; border-bottom: var(--farta-border-default); }
 .roleField { display: grid; gap: 8px; margin-top: 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .roleField select { min-height: 48px; padding: 0 12px; border: var(--farta-border-default); border-radius: var(--farta-radius-control); background: var(--farta-color-surface-primary); color: var(--farta-color-text-primary); font: inherit; }
+.inviteForm { display: grid; gap: 18px; }
+.inviteForm .feedback, .inviteForm .success { margin-bottom: 0; }
+.inviteForm input[readonly] { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
 .companyContext { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 18px 20px; background: var(--farta-color-success-soft); border-radius: var(--farta-radius-card); }
 .companyContext strong { display: block; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
 .companyContext span { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
@@ -50,4 +53,12 @@
 .accessCard h2 { margin-top: 0; font-size: 20px; }
 .empty { padding: 40px 28px; text-align: center; }
 .empty p { margin-bottom: 16px; }
+.clearFilter { align-self: end; min-height: 44px; padding: 9px 14px; color: var(--farta-color-brand-primary); background: transparent; border: 1px solid transparent; border-radius: var(--farta-radius-control); font: var(--farta-type-label); cursor: pointer; }
+.clearFilter:hover:not(:disabled) { background: var(--farta-color-success-soft); }
+.clearFilter:disabled { color: var(--farta-color-text-muted); cursor: not-allowed; opacity: .65; }
+.clearFilter:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.status { display: inline-flex; align-items: center; width: max-content; padding: 5px 10px; border-radius: var(--farta-radius-pill); font: var(--farta-type-caption); font-weight: 700; }
+.active { color: var(--farta-color-success); background: var(--farta-color-success-soft); }
+.inactive { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
+.pending { color: var(--farta-color-warning); background: var(--farta-color-warning-soft); }
 @media (max-width: 760px) { .page { padding: 28px 16px 56px; } .header { align-items: flex-start; flex-direction: column; padding-bottom: 22px; } .header h1 { font-size: 34px; line-height: 40px; } .header + .actions { margin-top: -12px; } .grid { grid-template-columns: 1fr; } .wide, .accessCard { grid-column: auto; } .actions { flex-direction: column; } .actions > * { width: 100%; } .actions a > button { width: 100%; } .card { padding: 22px 20px; } .cardFooter { align-items: stretch; flex-direction: column; margin: 22px -20px -22px; padding: 14px 20px; } .cardFooter a { display: flex; justify-content: center; align-items: center; width: 100%; } .companyContext { align-items: flex-start; } .summaryHeader { align-items: flex-start; flex-direction: column; } .statusRow { align-items: stretch; flex-direction: column; } }

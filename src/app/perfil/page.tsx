@@ -23,7 +23,7 @@ export default async function ProfilePage() {
         <h2>{current.profile.full_name || 'Usuário'}</h2>
         <p>{current.user.email}</p>
         <span className={styles.role}>{roleLabels[current.profile.role] ?? current.profile.role}</span>
-        {current.profile.role === 'CUSTOMER' && current.company?.display_name && <p className={styles.company}>Empresa: {current.company.display_name}</p>}
+        {current.profile.role === 'CUSTOMER' && current.company?.display_name && <p className={styles.company}><span>Empresa</span><strong>{current.company.display_name}</strong></p>}
       </Card>
       <Card>
         <ProfileForm initialPhone={current.profile.phone} />

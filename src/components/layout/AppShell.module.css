@@ -1,46 +1,46 @@
-.shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); min-height: 100svh; background: var(--farta-color-surface-page); }
-.skipLink { position: fixed; z-index: 50; top: -60px; left: 16px; padding: 10px 16px; color: #fff; background: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); }
+.shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100svh; background: var(--farta-color-surface-page); }
+.customerShell { grid-template-columns: 220px minmax(0, 1fr); }
+.skipLink { position: fixed; z-index: 50; top: -60px; left: 16px; padding: 10px 16px; color: #fff; background: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
 .skipLink:focus { top: 12px; }
-.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; gap: 20px; height: 100svh; min-height: 460px; padding: 24px 16px; color: #fff; background: var(--farta-color-brand-primary); }
-.sidebarBrand { display: grid; place-items: center; align-self: center; width: 100%; height: 104px; overflow: hidden; padding: 4px; border-radius: var(--farta-radius-card); }
-.sidebarBrand img { display: block; width: min(100%, 156px); height: 104px; object-fit: contain; mix-blend-mode: screen; }
+.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; gap: 24px; height: 100svh; min-height: 460px; padding: 24px 16px; color: #fff; background: var(--farta-color-brand-primary); }
+.sidebarBrand { display: grid; place-items: center; align-self: center; width: 100%; height: 96px; overflow: hidden; padding: 4px; border-radius: var(--farta-radius-card); }
+.sidebarBrand img { display: block; width: min(100%, 148px); height: 96px; object-fit: contain; mix-blend-mode: screen; }
 .tagline { margin: auto 12px 8px; color: rgb(255 255 255 / 70%); font: var(--farta-type-caption); }
 .workspace { min-width: 0; }
-.header { display: flex; align-items: center; gap: 16px; min-height: 76px; padding: 12px 32px; background: var(--farta-color-surface-primary); border-bottom: var(--farta-border-default); }
+.header { display: flex; align-items: center; gap: 16px; min-height: 88px; padding: 16px 32px; background: var(--farta-color-surface-primary); border-bottom: var(--farta-border-default); }
 .workspaceLabel { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
-.mobileBrand { display: none; align-items: center; gap: 10px; color: var(--farta-color-brand-primary); font: 700 20px/24px "Gilroy", Arial, sans-serif; }
+.mobileBrand { display: none; align-items: center; gap: 10px; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
 .mobileBrand img { display: block; border-radius: 8px; }
-.actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
-.notificationLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
-.notificationLink:hover { background: var(--farta-color-surface-secondary); }
-.profileLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
-.profileLink:hover { background: var(--farta-color-surface-secondary); }
+.actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.notificationLink, .profileLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
+.notificationLink:hover, .profileLink:hover { background: var(--farta-color-surface-secondary); }
 .actions button { min-height: 44px; padding: 0 16px; color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-default); border-radius: var(--farta-radius-control); font: var(--farta-type-label); cursor: pointer; }
 .actions button:hover:not(:disabled) { background: var(--farta-color-surface-secondary); }
 .actions button:disabled { opacity: .6; cursor: wait; }
-.content { min-width: 0; min-height: calc(100svh - 76px); }
+.notificationLink:focus-visible, .profileLink:focus-visible, .actions button:focus-visible, .sidebarBrand:focus-visible { outline: 3px solid var(--farta-color-accent); outline-offset: 2px; }
+.content { min-width: 0; min-height: calc(100svh - 88px); }
 @media (max-width: 1023px) {
-  .shell { grid-template-columns: 76px minmax(0, 1fr); }
+  .shell, .customerShell { grid-template-columns: 76px minmax(0, 1fr); }
   .sidebar { padding: 16px 8px; }
   .sidebarBrand { height: 54px; padding: 0; }
-  .sidebarBrand img { width: 54px; height: 54px; object-fit: contain; mix-blend-mode: screen; }
-  .tagline { display: none; }
+  .sidebarBrand img { width: 54px; height: 54px; }
+  .tagline, .workspaceLabel { display: none; }
   .header { padding-inline: 20px; }
 }
 @media (max-width: 639px) {
-  .shell { display: block; }
+  .shell, .customerShell { display: block; }
   .sidebar { position: static; display: contents; }
   .sidebarBrand { display: none; }
   .header { position: relative; min-height: 64px; padding: 8px 16px; }
   .mobileBrand { display: inline-flex; }
   .mobileBrand img { width: 40px; height: 40px; object-fit: contain; }
-  .workspaceLabel { display: none; }
-  .actions { gap: 4px; }
-  .notificationLink, .profileLink { padding-inline: 6px; font-size: 13px; }
+  .actions { gap: 2px; }
+  .notificationLink, .profileLink { min-height: 44px; padding-inline: 7px; font-size: 13px; }
   .actions button { padding-inline: 10px; }
   .content { min-height: calc(100svh - 64px); padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 359px) {
   .mobileBrand span { display: none; }
+  .notificationLink { display: none; }
   .actions { gap: 0; }
 }

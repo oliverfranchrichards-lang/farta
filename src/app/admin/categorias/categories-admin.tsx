@@ -138,6 +138,7 @@ export function CategoriesAdmin({
         </h2>
         <label className={styles.field} htmlFor="category-search">Buscar categoria<input id="category-search" type="search" placeholder="Nome da categoria" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
         <label className={styles.field} htmlFor="category-filter-status">Status<select id="category-filter-status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">Todas</option><option value="ACTIVE">Ativas</option><option value="INACTIVE">Inativas</option></select></label>
+        <button className={styles.clearFilter} type="button" onClick={() => { setQuery(''); setStatusFilter(''); }} disabled={!query && !statusFilter}>Limpar filtros</button>
       </div>
       <p className={styles.confirmHint} role="status">Exibindo {filteredCategories.length} de {categories.length} categorias</p>
       <div className={`${styles.tableWrap} ${styles.categoryTable}`}>

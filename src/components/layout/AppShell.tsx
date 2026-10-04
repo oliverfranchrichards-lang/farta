@@ -22,7 +22,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         : undefined;
   const showCustomerNotifications = !navProfile;
 
-  return <div className={styles.shell}>
+  const customerShell = !isAdmin && !pathname?.startsWith("/operacao");
+  return <div className={`${styles.shell} ${customerShell ? styles.customerShell : ""}`}>
     <a className={styles.skipLink} href="#main-content">Pular para o conteúdo</a>
     <aside className={styles.sidebar}>
       <Link className={styles.sidebarBrand} href="/" aria-label="Farta, início"><Image src="/farta-logo-light.png" alt="" width={188} height={188} priority /></Link>
