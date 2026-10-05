@@ -1,0 +1,19 @@
+.page { min-height: 100svh; background: var(--farta-color-surface-page); }
+.content { max-width: 920px; margin: 0 auto; padding: 38px 40px 72px; }
+.backLink { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 20px; color: var(--farta-color-brand-primary); font: var(--farta-type-label); text-decoration: underline; text-underline-offset: 3px; }
+.panel { padding: 24px; border-radius: 12px; }
+.list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.item { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 0; border-bottom: var(--farta-border-default); }
+.item:first-child { padding-top: 0; }
+.item:last-child { padding-bottom: 0; border-bottom: 0; }
+.itemCopy { min-width: 0; }
+.itemCopy strong { color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.itemCopy p { margin: 6px 0 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); overflow-wrap: anywhere; }
+.itemCopy a { color: var(--farta-color-brand-primary); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.item time { white-space: nowrap; }
+.empty, .error { display: grid; justify-items: center; gap: 8px; min-height: 220px; padding: 48px 20px; color: var(--farta-color-text-secondary); text-align: center; }
+.empty strong, .error strong { color: var(--farta-color-text-primary); font: var(--farta-type-h3); }
+.empty p, .error p { max-width: 520px; margin: 0; font: var(--farta-type-body-sm); }
+.emptyAction { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 8px; padding: 10px 16px; color: #fff; background: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); text-decoration: none; }
+.error { color: var(--farta-color-danger); background: var(--farta-color-danger-soft); border-radius: var(--farta-radius-control); }
+@media (max-width: 639px) { .content { padding: 24px 16px 48px; } .panel { padding: 18px 16px; } .item { flex-direction: column; gap: 10px; } .item time { white-space: normal; } }

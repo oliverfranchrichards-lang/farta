@@ -1,4 +1,4 @@
-.page { max-width: 1180px; margin: 0 auto; padding: 38px 32px 72px; color: var(--farta-color-text-primary); }
+.page { max-width: 1180px; margin: 0 auto; padding: 38px 40px 72px; color: var(--farta-color-text-primary); }
 .breadcrumb { margin-bottom: 18px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .breadcrumb a { color: inherit; text-decoration: none; }
 .breadcrumb a:hover { color: var(--farta-color-brand-primary); text-decoration: underline; }
@@ -10,8 +10,11 @@
 .summaryHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
 .summaryHeader h2 { margin: 0; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
 .summaryHeader span { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
-.filterBar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 0 0 20px; padding: 16px; background: var(--farta-color-surface-secondary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
+.filterBar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 20px; padding: 14px 16px; background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
 .filterField { display: grid; gap: 6px; min-width: min(100%, 260px); color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.filterBar .filterField { font-size: 0; }
+.filterBar .filterField:first-child { flex: 1 1 520px; }
+.filterBar .filterField:nth-child(2) { flex: 0 1 240px; }
 .filterField input, .filterField select { min-height: 44px; padding: 9px 12px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
 .filterField input:focus-visible, .filterField select:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
 .filterSummary { margin: -8px 0 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
@@ -40,6 +43,13 @@
 .statusRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; padding-bottom: 22px; border-bottom: var(--farta-border-default); }
 .roleField { display: grid; gap: 8px; margin-top: 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .roleField select { min-height: 48px; padding: 0 12px; border: var(--farta-border-default); border-radius: var(--farta-radius-control); background: var(--farta-color-surface-primary); color: var(--farta-color-text-primary); font: inherit; }
+.roleOptions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; border: 0; }
+.roleOptions legend { margin-bottom: 8px; color: var(--farta-color-text-secondary); font: var(--farta-type-label); }
+.roleOption, .roleOptionSelected { position: relative; display: grid; min-height: 92px; place-items: center; padding: 16px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-strong); border-radius: 10px; cursor: pointer; text-align: center; }
+.roleOptionSelected { background: var(--farta-color-success-soft); border-color: var(--farta-color-brand-primary); box-shadow: inset 0 0 0 1px var(--farta-color-brand-primary); }
+.roleOption input, .roleOptionSelected input { position: absolute; opacity: 0; pointer-events: none; }
+.roleOption span, .roleOptionSelected span { display: grid; gap: 4px; }
+.roleOption small, .roleOptionSelected small { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .inviteForm { display: grid; gap: 18px; }
 .inviteForm .feedback, .inviteForm .success { margin-bottom: 0; }
 .inviteForm input[readonly] { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
@@ -57,8 +67,28 @@
 .clearFilter:hover:not(:disabled) { background: var(--farta-color-success-soft); }
 .clearFilter:disabled { color: var(--farta-color-text-muted); cursor: not-allowed; opacity: .65; }
 .clearFilter:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.companyTableCard { overflow-x: auto; background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); }
+.companyTable { width: 100%; min-width: 760px; border-collapse: collapse; font: var(--farta-type-body-sm); }
+.companyTable th { padding: 16px 28px; color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); border-bottom: var(--farta-border-default); font: var(--farta-type-label); text-align: left; }
+.companyTable td { padding: 22px 28px; color: var(--farta-color-text-secondary); border-bottom: var(--farta-border-default); vertical-align: middle; }
+.companyTable tbody tr:last-child td { border-bottom: 0; }
+.companyTable td:first-child { min-width: 340px; color: var(--farta-color-text-primary); }
+.companyTable td:first-child strong, .companyTable td:first-child span { display: block; }
+.companyTable td:first-child strong { font-size: 16px; line-height: 22px; }
+.companyTable td:first-child span { margin-top: 2px; color: var(--farta-color-text-secondary); }
+.companyTable td:first-child em { margin-top: 6px; font-style: normal; }
+.actionLinks { display: flex; gap: 8px; }
+.iconAction { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; color: var(--farta-color-text-secondary); border-radius: var(--farta-radius-control); }
+.iconAction svg { width: 18px; height: 18px; }
+.iconAction:hover { color: var(--farta-color-brand-primary); background: var(--farta-color-success-soft); }
+.iconAction:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.compactStatus { display: flex; align-items: center; gap: 8px; }
+.compactStatus button { min-height: 36px; padding: 7px 10px; font-size: 12px; }
+.compactStatus .feedback, .compactStatus .success { position: absolute; z-index: 2; width: 240px; margin-top: 8px; }
 .status { display: inline-flex; align-items: center; width: max-content; padding: 5px 10px; border-radius: var(--farta-radius-pill); font: var(--farta-type-caption); font-weight: 700; }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .active { color: var(--farta-color-success); background: var(--farta-color-success-soft); }
 .inactive { color: var(--farta-color-text-secondary); background: var(--farta-color-surface-secondary); }
 .pending { color: var(--farta-color-warning); background: var(--farta-color-warning-soft); }
 @media (max-width: 760px) { .page { padding: 28px 16px 56px; } .header { align-items: flex-start; flex-direction: column; padding-bottom: 22px; } .header h1 { font-size: 34px; line-height: 40px; } .header + .actions { margin-top: -12px; } .grid { grid-template-columns: 1fr; } .wide, .accessCard { grid-column: auto; } .actions { flex-direction: column; } .actions > * { width: 100%; } .actions a > button { width: 100%; } .card { padding: 22px 20px; } .cardFooter { align-items: stretch; flex-direction: column; margin: 22px -20px -22px; padding: 14px 20px; } .cardFooter a { display: flex; justify-content: center; align-items: center; width: 100%; } .companyContext { align-items: flex-start; } .summaryHeader { align-items: flex-start; flex-direction: column; } .statusRow { align-items: stretch; flex-direction: column; } }
+@media (max-width: 760px) { .roleOptions { grid-template-columns: 1fr; } .filterBar { align-items: stretch; flex-direction: column; } .filterBar .filterField:first-child, .filterBar .filterField:nth-child(2) { flex: 1 1 auto; width: 100%; } .filterBar .clearFilter { align-self: flex-start; } }

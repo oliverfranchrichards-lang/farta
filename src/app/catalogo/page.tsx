@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { CartItemControls } from "@/components/cart/CartItemControls";
 import { BannerCarousel } from "./banner-carousel";
@@ -84,13 +84,24 @@ export default function Catalogo() {
     if (result.ok) setCart(result.cart); else setNotice(result.message);
   }
 
-  async function changeEstablishment(id: string) {
+  const changeEstablishment = useCallback(async (id: string) => {
     if (!id || id === selectedId || busy || busySkus.length > 0) return;
     setCart(null); setItemError(null); setUndo(null); setNotice("Atualizando estabelecimento…"); setBusy(true);
     try { const result = await selectCustomerEstablishment(id); if (result.ok) { setSelectedId(id); await reloadCart(); setNotice("Estabelecimento atualizado."); } else setNotice(result.message); }
     catch { setNotice("Não foi possível atualizar o estabelecimento. Tente novamente."); }
     finally { setBusy(false); }
-  }
+  }, [busy, busySkus.length, selectedId]);
+
+  useEffect(() => {
+    const onSearch = (event: Event) => setQuery((event as CustomEvent<string>).detail ?? "");
+    const onEstablishment = (event: Event) => void changeEstablishment((event as CustomEvent<string>).detail ?? "");
+    window.addEventListener("farta:catalog-search", onSearch);
+    window.addEventListener("farta:catalog-establishment", onEstablishment);
+    return () => {
+      window.removeEventListener("farta:catalog-search", onSearch);
+      window.removeEventListener("farta:catalog-establishment", onEstablishment);
+    };
+  }, [changeEstablishment]);
 
   async function add(skuId: string, quantity = 1) {
     if (busy || busyRef.current.has(skuId)) return;
@@ -119,20 +130,23 @@ export default function Catalogo() {
 
   return <main className={styles.page} aria-busy={busy || loading}><div className={styles.content}>
     <div className={styles.contextBar}><label htmlFor="catalog-establishment">Estabelecimento</label><select id="catalog-establishment" value={selectedId} disabled={busy || loading || busySkus.length > 0} onChange={event => void changeEstablishment(event.target.value)}><option value="">Selecione</option>{establishments.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>{busy && <span role="status" aria-live="polite">Atualizando estabelecimento…</span>}</div>
-    <PageHeader eyebrow="COMPRAR" title="Catálogo de produtos" description="Encontre itens para reposição, compare disponibilidade e monte seu pedido de forma rápida e eficiente." />
+    <section className={styles.discoveryHeader} aria-labelledby="catalog-title">
+      <PageHeader title="Olá, vamos abastecer sua operação?" description="Tudo o que seu negócio precisa, em um só pedido." />
+    </section>
     <BannerCarousel banners={banners} />
-    <section className={styles.search} aria-label="Busca e filtros"><Input id="catalog-search" label="Buscar produto, marca, categoria ou embalagem" value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)} placeholder="Buscar produto, marca, categoria ou embalagem" className={styles.searchInputControl} /><Button type="button" onClick={() => setNotice(query ? `Resultados para “${query}”.` : "Informe o que deseja buscar.")}>Buscar</Button><Button type="button" variant="secondary" onClick={() => { setQuery(""); setCategory("Todos"); }}>Limpar filtros</Button></section>
+    <section className={styles.search} aria-label="Busca e filtros"><Input id="catalog-search" label="Buscar produto, marca, categoria ou embalagem" value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)} placeholder="Busque por produto, marca ou embalagem" className={styles.searchInputControl} /><Button type="button" onClick={() => setNotice(query ? `Resultados para “${query}”.` : "Informe o que deseja buscar.")}>Buscar</Button><Button type="button" variant="secondary" onClick={() => { setQuery(""); setCategory("Todos"); }}>Limpar filtros</Button></section>
     {notice && <div className={styles.notice} role="status" aria-live="polite">{notice}<Button type="button" variant="tertiary" onClick={() => setNotice("")} aria-label="Fechar aviso">×</Button></div>}
     {undo && <div className={styles.undoNotice} role="status">{undo.name} removido do carrinho. <Button type="button" variant="tertiary" onClick={() => void undoRemoval()}>Desfazer</Button></div>}
-    <div className={styles.chips} role="group" aria-label="Categorias">{categories.map(item => <Button type="button" variant="tertiary" aria-pressed={category === item} className={category === item ? styles.selected : ""} key={item} onClick={() => setCategory(item)}>{item}</Button>)}</div>
-    <div className={styles.filters}><Button type="button" variant="tertiary" className={styles.sort} onClick={() => setSortAscending(current => !current)} aria-pressed={sortAscending}>Ordenar: {sortAscending ? "menor preço" : "maior preço"}</Button></div>
+    <section className={styles.categorySection} aria-labelledby="category-title"><h2 id="category-title">O que você precisa hoje?</h2><div className={styles.chips} role="group" aria-label="Categorias">{categories.map(item => <Button type="button" variant="tertiary" aria-pressed={category === item} className={`${styles.categoryCard} ${category === item ? styles.selected : ""}`} key={item} onClick={() => setCategory(item)}><span className={styles.categoryIcon} aria-hidden="true">{item === "Todos" ? "▦" : item.slice(0, 1).toUpperCase()}</span><span>{item}</span></Button>)}</div></section>
+    <div className={styles.productHeading}><h2>Para sua próxima reposição</h2><div className={styles.filters}><Button type="button" variant="tertiary" className={styles.sort} onClick={() => setSortAscending(current => !current)} aria-pressed={sortAscending}>Ordenar: {sortAscending ? "menor preço" : "recomendados"}⌄</Button></div></div>
     <section className={styles.workspace}><div className={styles.productGrid}>{loading ? <p role="status">Carregando catálogo…</p> : visible.length === 0 ? <p role="status">Nenhum produto encontrado. Tente limpar os filtros.</p> : visible.map(product => {
         const imageUrl = product.imageUrl ?? semanticImageUrl(product);
         const label = product.saleUnit === "BOX" ? "caixa" : "unidade";
         const minimum = product.minimumQuantity;
         const quantity = catalogQuantities[product.skuId] ?? minimum;
         return <Card className={styles.product} key={product.skuId}>
-          <Badge tone={product.priceMinor == null ? "default" : "success"}>{product.priceMinor == null ? "Preço não definido" : "Disponível"}</Badge>
+          <div className={styles.productCategory}>{product.category || "Farta"}</div>
+          {product.priceMinor == null && <Badge tone="default">Preço não definido</Badge>}
           <div className={styles.productImage}><Image src={imageUrl} alt={product.imageAlt ?? product.name} width={640} height={480} /></div>
           <small>{product.brand} / {product.detail}</small>
           <h2>{product.name}</h2>

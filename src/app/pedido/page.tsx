@@ -489,6 +489,7 @@ export default function Pedido() {
     );
   if (!cart) return null;
   const activeCart = cart;
+  const selectedEstablishmentName = establishments.find((item) => item.id === selectedEstablishmentId)?.name ?? "Estabelecimento selecionado";
   return (
     <main
       className={styles.page}
@@ -510,11 +511,16 @@ export default function Pedido() {
         <Link className={styles.backLink} href="/catalogo">
           ← Voltar ao catálogo
         </Link>
-        <h1>Criar pedido</h1>
+        <h1>Vamos revisar seu pedido?</h1>
+        <p className={styles.pageIntro}>Confira os produtos e as quantidades antes de enviar para análise.</p>
+        <div className={styles.sharedCartNotice} role="status">
+          <strong>{selectedEstablishmentName} · Carrinho compartilhado</strong>
+          <span>Sua equipe também pode adicionar e ajustar produtos neste pedido.</span>
+        </div>
         <div className={styles.layout}>
           <div className={styles.mainColumn}>
             <Card>
-              <h2>Itens do pedido</h2>
+              <div className={styles.sectionHeading}><h2>Seus produtos</h2><span>{activeCart.items.length} produtos · {activeCart.units} volumes</span></div>
               {undo && (
                 <div className={styles.undoNotice} role="status">
                   {undo.name} removido do pedido.{" "}

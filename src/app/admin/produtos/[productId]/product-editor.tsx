@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -80,6 +80,11 @@ export function ProductEditor({
   const [priceError, setPriceError] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageAlt, setImageAlt] = useState("");
+  const closeDrawerRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const [activeTab, setActiveTab] = useState<"main" | "variants" | "images">(
+    "main",
+  );
 
   function clearFeedback() {
     setNotice("");
@@ -142,11 +147,29 @@ export function ProductEditor({
 
   useEffect(() => {
     if (!editingVariant) return;
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    window.requestAnimationFrame(() => closeDrawerRef.current?.focus());
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setEditingVariant(null);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setEditingVariant(null);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const dialog = document.querySelector<HTMLElement>("[aria-labelledby='edit-variant-title']");
+      if (!dialog) return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>("button, input, select, textarea, [href]")).filter((element) => !element.hasAttribute("disabled"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      previousFocusRef.current?.focus();
+    };
   }, [editingVariant]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -335,19 +358,40 @@ export function ProductEditor({
 
   return (
     <>
-      <Card className={styles.formCard}>
+      {notice && <div className={styles.notice} role="status">{notice}</div>}
+      {error && <div className={styles.error} role="alert">{error}</div>}
+      <nav className={styles.editorTabs} aria-label="Seções do produto">
+        <button
+          type="button"
+          className={activeTab === "main" ? styles.editorTabActive : styles.editorTab}
+          aria-current={activeTab === "main" ? "page" : undefined}
+          onClick={() => setActiveTab("main")}
+        >
+          Informações principais
+        </button>
+        <button
+          type="button"
+          className={activeTab === "variants" ? styles.editorTabActive : styles.editorTab}
+          aria-current={activeTab === "variants" ? "page" : undefined}
+          onClick={() => setActiveTab("variants")}
+        >
+          Variantes <span className={styles.tabCount}>{variants.length}</span>
+        </button>
+        <button
+          type="button"
+          className={activeTab === "images" ? styles.editorTabActive : styles.editorTab}
+          aria-current={activeTab === "images" ? "page" : undefined}
+          onClick={() => setActiveTab("images")}
+        >
+          Imagens <span className={styles.tabCount}>{images.length}</span>
+        </button>
+      </nav>
+
+      {activeTab === "main" && (
+        <section className={styles.editorLayout}>
+          <Card className={styles.formCard}>
         <form className={styles.form} onSubmit={save}>
           <h2>Informações principais</h2>
-          {notice && (
-            <div className={styles.notice} role="status">
-              {notice}
-            </div>
-          )}
-          {error && (
-            <div className={styles.error} role="alert">
-              {error}
-            </div>
-          )}
           <label className={styles.field} htmlFor="product-name">
             Nome do produto
             <input
@@ -407,9 +451,25 @@ export function ProductEditor({
             </Button>
           </div>
         </form>
-      </Card>
+          </Card>
+          <aside className={styles.productSummary} aria-label="Resumo do produto">
+            <h2>Resumo do produto</h2>
+            <strong>{name || product.name}</strong>
+            <p className={`${styles.summaryStatus} ${status === "ACTIVE" ? "" : styles.summaryStatusInactive}`}>
+              <span aria-hidden="true" />
+              Produto {status === "ACTIVE" ? "ativo" : "inativo"}
+            </p>
+            <p>{brand || "Sem marca"} · {categories.find((category) => category.id === categoryId)?.name ?? "Sem categoria"}</p>
+            <div className={styles.summaryDivider} />
+            <div className={styles.summaryMetrics}>
+              <div><strong>{variants.length}</strong><span>variantes</span></div>
+              <div><strong>{images.length}</strong><span>imagens</span></div>
+            </div>
+          </aside>
+        </section>
+      )}
 
-      <section className={styles.variantSection}>
+      {activeTab === "variants" && <section className={styles.variantSection}>
         <header>
           <h2>Variantes / SKUs</h2>
         </header>
@@ -492,12 +552,13 @@ export function ProductEditor({
                     </p>
                   </div>
                   <Button
+                    ref={closeDrawerRef}
                     type="button"
                     variant="tertiary"
                     onClick={() => setEditingVariant(null)}
                     aria-label="Fechar edição da variante"
                   >
-                    Fechar
+                    ×
                   </Button>
                 </div>
                 <fieldset className={styles.priceFieldset}>
@@ -764,43 +825,26 @@ export function ProductEditor({
           </form>
         </Card>
 
-        <Card className={styles.formCard}>
+      </section>}
+
+      {activeTab === "images" && <section className={styles.imagesSection}>
+        <Card className={styles.imageCard}>
           <form className={styles.form} onSubmit={uploadImage}>
-            <h2>Imagens do produto</h2>
-            <div className={styles.imageUpload}>
-              <p className={styles.imageMeta}>
-                {images.length} imagem(ns) cadastrada(s). Use JPEG, PNG ou WebP de
-                até 5 MB.
-              </p>
-              <label className={styles.field} htmlFor="product-image">
-                Arquivo
-                <input
-                  id="product-image"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) =>
-                    setImageFile(event.target.files?.[0] ?? null)
-                  }
-                />
-              </label>
-              <label className={styles.field} htmlFor="product-image-alt">
-                Texto alternativo
-                <input
-                  id="product-image-alt"
-                  required
-                  value={imageAlt}
-                  onChange={(event) => setImageAlt(event.target.value)}
-                />
-              </label>
-              <div className={styles.formActions}>
-                <Button type="submit" disabled={busy || !imageFile}>
-                  {busy ? "Enviando…" : "Cadastrar imagem"}
-                </Button>
-              </div>
+            <div className={styles.sectionHeading}>
+              <div><h2>Imagens do produto</h2><p>Adicione fotos claras para facilitar a identificação do produto no catálogo.</p></div>
+              <span className={styles.count}>{images.length}</span>
             </div>
+            <div className={styles.imageUpload}>
+              <span className={styles.uploadIcon} aria-hidden="true">⌁</span>
+              <strong>Arraste uma imagem ou selecione um arquivo</strong>
+              <span className={styles.imageMeta}>JPEG, PNG ou WebP · até 5 MB</span>
+              <label className={styles.filePicker} htmlFor="product-image">Selecionar arquivo<input id="product-image" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setImageFile(event.target.files?.[0] ?? null)} /></label>
+            </div>
+            <label className={styles.field} htmlFor="product-image-alt">Texto alternativo<input id="product-image-alt" required placeholder="Descreva a imagem para acessibilidade" value={imageAlt} onChange={(event) => setImageAlt(event.target.value)} /></label>
+            <div className={styles.formActions}><Button type="submit" disabled={busy || !imageFile}>{busy ? "Enviando…" : "Cadastrar imagem"}</Button></div>
           </form>
         </Card>
-      </section>
+      </section>}
     </>
   );
 }

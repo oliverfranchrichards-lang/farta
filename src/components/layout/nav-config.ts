@@ -16,9 +16,9 @@ export const navByProfile: Record<NavProfile, NavItem[]> = {
   DRIVER: [{ href: "/operacao/entregas", label: "Entregas", icon: "delivery" }, { href: "/mensagens", label: "Mensagens", icon: "support" }],
   PLATFORM_ADMIN: [
     { href: "/admin/empresas", label: "Empresas", icon: "home" },
+    { href: "/admin/pedidos", label: "Pedidos", icon: "orders" },
     { href: "/admin/produtos", label: "Produtos", icon: "inventory" },
     { href: "/admin/banners", label: "Banners", icon: "support" },
-    { href: "/admin/pedidos", label: "Pedidos", icon: "orders" },
   ],
 };
 

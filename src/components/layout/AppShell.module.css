@@ -2,30 +2,47 @@
 .customerShell { grid-template-columns: 220px minmax(0, 1fr); }
 .skipLink { position: fixed; z-index: 50; top: -60px; left: 16px; padding: 10px 16px; color: #fff; background: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
 .skipLink:focus { top: 12px; }
-.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; gap: 24px; height: 100svh; min-height: 460px; padding: 24px 16px; color: #fff; background: var(--farta-color-brand-primary); }
-.sidebarBrand { display: grid; place-items: center; align-self: center; width: 100%; height: 96px; overflow: hidden; padding: 4px; border-radius: var(--farta-radius-card); }
-.sidebarBrand img { display: block; width: min(100%, 148px); height: 96px; object-fit: contain; mix-blend-mode: screen; }
+.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; gap: 28px; height: 100svh; min-height: 460px; padding: 32px; color: #fff; background: #1b3b2e; }
+.customerShell .sidebar { padding: 24px; }
+.sidebarBrand { display: grid; place-items: center; align-self: flex-start; width: 100%; height: 96px; overflow: hidden; border-radius: var(--farta-radius-card); }
+.sidebarBrand img { display: block; width: min(100%, 144px); height: 96px; object-fit: contain; mix-blend-mode: screen; }
 .tagline { margin: auto 12px 8px; color: rgb(255 255 255 / 70%); font: var(--farta-type-caption); }
 .workspace { min-width: 0; }
-.header { display: flex; align-items: center; gap: 16px; min-height: 88px; padding: 16px 32px; background: var(--farta-color-surface-primary); border-bottom: var(--farta-border-default); }
+.header { display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 12px 40px; background: var(--farta-color-surface-primary); border-bottom: var(--farta-border-default); }
+.customerShell .header { min-height: 90px; padding-inline: 36px; }
 .workspaceLabel { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
+.customerWorkspaceLabel { display: grid; gap: 2px; min-width: 150px; color: var(--farta-color-text-primary); }
+.customerWorkspaceLabel small { color: var(--farta-color-text-muted); font: var(--farta-type-caption); letter-spacing: .08em; text-transform: uppercase; }
+.customerWorkspaceLabel strong { color: var(--farta-color-text-primary); font: var(--farta-type-label); }
+.customerWorkspaceLabel select { min-width: 150px; max-width: 190px; padding: 0 20px 0 0; color: var(--farta-color-text-primary); background: transparent; border: 0; font: var(--farta-type-label); }
+.customerWorkspaceLabel select:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 3px; border-radius: 4px; }
+.customerSearch { display: flex; flex: 1 1 auto; align-items: center; gap: 10px; min-width: 180px; height: 46px; margin-left: 8px; padding: 0 16px; color: var(--farta-color-text-muted); background: var(--farta-color-surface-secondary); border-radius: 10px; }
+.customerSearch svg { flex: 0 0 20px; width: 20px; height: 20px; }
+.customerSearch input { width: 100%; min-width: 0; color: var(--farta-color-text-primary); background: transparent; border: 0; outline: 0; font: var(--farta-type-body-sm); }
+.customerSearch input::placeholder { color: var(--farta-color-text-muted); opacity: 1; }
+.customerSearch:focus-within { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
 .mobileBrand { display: none; align-items: center; gap: 10px; color: var(--farta-color-brand-primary); font: var(--farta-type-h3); }
 .mobileBrand img { display: block; border-radius: 8px; }
 .actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.notificationLink, .profileLink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
+.notificationLink, .profileLink { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; color: var(--farta-color-brand-primary); border-radius: var(--farta-radius-control); font: var(--farta-type-label); }
+.notificationLink svg, .profileLink svg, .signOutButton svg { width: 20px; height: 20px; }
+.notificationLink span, .profileLink span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .notificationLink:hover, .profileLink:hover { background: var(--farta-color-surface-secondary); }
-.actions button { min-height: 44px; padding: 0 16px; color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-default); border-radius: var(--farta-radius-control); font: var(--farta-type-label); cursor: pointer; }
+.actions button { min-height: 44px; padding: 0 12px; color: var(--farta-color-brand-primary); background: var(--farta-color-surface-primary); border: 1px solid var(--farta-color-border-default); border-radius: var(--farta-radius-control); font: var(--farta-type-label); cursor: pointer; }
+.signOutButton { display: inline-flex; align-items: center; justify-content: center; min-width: 44px !important; padding: 0 10px !important; color: var(--farta-color-danger) !important; border-color: transparent !important; }
+.signOutButton span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .actions button:hover:not(:disabled) { background: var(--farta-color-surface-secondary); }
 .actions button:disabled { opacity: .6; cursor: wait; }
 .notificationLink:focus-visible, .profileLink:focus-visible, .actions button:focus-visible, .sidebarBrand:focus-visible { outline: 3px solid var(--farta-color-accent); outline-offset: 2px; }
-.content { min-width: 0; min-height: calc(100svh - 88px); }
+.content { min-width: 0; min-height: calc(100svh - 72px); }
+.customerShell .content { min-height: calc(100svh - 90px); }
 @media (max-width: 1023px) {
   .shell, .customerShell { grid-template-columns: 76px minmax(0, 1fr); }
   .sidebar { padding: 16px 8px; }
   .sidebarBrand { height: 54px; padding: 0; }
   .sidebarBrand img { width: 54px; height: 54px; }
   .tagline, .workspaceLabel { display: none; }
-  .header { padding-inline: 20px; }
+  .header, .customerShell .header { padding-inline: 20px; }
 }
 @media (max-width: 639px) {
   .shell, .customerShell { display: block; }
@@ -37,7 +54,8 @@
   .actions { gap: 2px; }
   .notificationLink, .profileLink { min-height: 44px; padding-inline: 7px; font-size: 13px; }
   .actions button { padding-inline: 10px; }
-  .content { min-height: calc(100svh - 64px); padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .customerSearch { display: none; }
+  .content, .customerShell .content { min-height: calc(100svh - 64px); padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 359px) {
   .mobileBrand span { display: none; }

@@ -36,14 +36,7 @@ export function InviteForm({ companyId }: { companyId: string }) {
         {(error || message) && <div ref={noticeRef} tabIndex={-1} className={error ? styles.feedback : styles.success} role={error ? 'alert' : 'status'} aria-live="polite">{error || message}</div>}
         {inviteLink && <Input id="invite-link" label="Link do convite" value={inviteLink} readOnly />}
         <Input id="invite-email" label="E-mail do convidado" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-        <label className={styles.roleField} htmlFor="invite-role">
-          Perfil de acesso
-          <select id="invite-role" value={role} onChange={(event) => setRole(event.target.value as InviteRole)}>
-            <option value="CUSTOMER">Cliente</option>
-            <option value="INTERNAL_OPERATOR">Operador interno</option>
-            <option value="DRIVER">Entregador</option>
-          </select>
-        </label>
+        <fieldset className={styles.roleOptions}><legend>Perfil de acesso</legend><label className={role === 'CUSTOMER' ? styles.roleOptionSelected : styles.roleOption}><input type="radio" name="invite-role" value="CUSTOMER" checked={role === 'CUSTOMER'} onChange={() => setRole('CUSTOMER')} /><span><strong>Cliente</strong><small>Acesso à empresa</small></span></label><label className={role === 'DRIVER' ? styles.roleOptionSelected : styles.roleOption}><input type="radio" name="invite-role" value="DRIVER" checked={role === 'DRIVER'} onChange={() => setRole('DRIVER')} /><span><strong>Entregador</strong><small>Rotas e entregas</small></span></label><label className={role === 'INTERNAL_OPERATOR' ? styles.roleOptionSelected : styles.roleOption}><input type="radio" name="invite-role" value="INTERNAL_OPERATOR" checked={role === 'INTERNAL_OPERATOR'} onChange={() => setRole('INTERNAL_OPERATOR')} /><span><strong>Operador interno</strong><small>Gestão da operação</small></span></label></fieldset>
         <div className={styles.actions}><Button type="submit" disabled={loading}>{loading ? 'Enviando…' : 'Criar convite'}</Button></div>
       </form>
     </Card>

@@ -40,6 +40,7 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
   const [status, setStatus] = useState('');
   const [query, setQuery] = useState('');
   const [notice, setNotice] = useState(initialError);
+  const [noticeTone, setNoticeTone] = useState<'success' | 'error'>(initialError ? 'error' : 'success');
   const [busy, setBusy] = useState('');
   const [drivers, setDrivers] = useState<CompanyDriver[]>([]);
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, string>>({});
@@ -47,11 +48,14 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
   const [detailBusy, setDetailBusy] = useState(false);
   const [finalPriceValues, setFinalPriceValues] = useState<Record<string, string>>({});
   const [finalPriceReason, setFinalPriceReason] = useState('');
+  const [exportBusy, setExportBusy] = useState<'xlsx' | 'pdf' | ''>('');
   const closeDetailRef = useRef<HTMLButtonElement>(null);
   const detailTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!detailOrder) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     closeDetailRef.current?.focus();
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -69,7 +73,10 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
   }, [detailOrder]);
 
   async function openDetails(orderId: string, trigger?: HTMLButtonElement) {
@@ -82,7 +89,7 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
       setFinalPriceValues(Object.fromEntries(result.order.items.map((item) => [item.skuId, ((item.finalUnitPriceMinor ?? item.approximateUnitPriceMinor ?? item.unitPriceMinor) / 100).toFixed(2)])));
       setFinalPriceReason('');
     }
-    else setNotice(result.message);
+    else { setNoticeTone('error'); setNotice(result.message); }
     setDetailBusy(false);
   }
 
@@ -91,11 +98,38 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
     detailTriggerRef.current?.focus();
   }
 
+  function showNotice(message: string, kind: 'success' | 'error') {
+    setNoticeTone(kind);
+    setNotice(message);
+  }
+
+  async function downloadOrder(format: 'xlsx' | 'pdf') {
+    if (!detailOrder || exportBusy) return;
+    setExportBusy(format);
+    setNotice('');
+    try {
+      const response = await fetch(`/api/operacao/pedidos/${detailOrder.id}/export?format=${format}`);
+      if (!response.ok) throw new Error('EXPORT_FAILED');
+      const fileUrl = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = `pedido-${detailOrder.orderNumber}.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+    } catch {
+      showNotice('Não foi possível baixar o pedido. Tente novamente.', 'error');
+    } finally {
+      setExportBusy('');
+    }
+  }
+
   useEffect(() => {
     if (scope !== 'company') return;
     void listCompanyDrivers().then((result) => {
       if (result.ok) setDrivers(result.drivers);
-      else setNotice(result.message);
+      else showNotice(result.message, 'error');
     });
   }, [scope]);
 
@@ -121,44 +155,48 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
     const requestedStatus = scope === 'driver' ? 'DISPATCHED' : nextStatus || undefined;
     const result = scope === 'admin' ? await listAdminOrders(requestedStatus) : await listCompanyOrders(requestedStatus);
     if (result.ok) setOrders(result.orders);
-    else setNotice(result.message);
+    else showNotice(result.message, 'error');
   }
 
   async function start(order: AdminOrder) {
     setBusy(order.id);
     setNotice('');
     const result = scope === 'company' ? await startCompanyOrderPicking(order.id) : await startOrderPicking(order.id);
-    if (!result.ok) setNotice(result.message);
-    else {
-      setNotice('Separação iniciada.');
+    if (!result.ok) {
+      showNotice(result.message, 'error');
+      setBusy('');
+      return false;
+    } else {
+      showNotice('Separação iniciada.', 'success');
       await refresh();
     }
     setBusy('');
+    return true;
   }
 
   async function advance(order: AdminOrder, toStatus: 'READY_FOR_DISPATCH' | 'DISPATCHED' | 'DELIVERED') {
     setBusy(order.id); setNotice('');
     const result = await advanceOrderStatus(order.id, toStatus);
-    if (!result.ok) setNotice(result.message); else { setNotice('Status atualizado.'); await refresh(); }
+    if (!result.ok) showNotice(result.message, 'error'); else { showNotice('Status atualizado.', 'success'); await refresh(); }
     setBusy('');
   }
 
   async function assignAndDispatch(order: AdminOrder) {
     const driverId = selectedDrivers[order.id];
     if (!driverId) {
-      setNotice('Selecione um entregador antes de enviar o pedido para rota.');
+      showNotice('Selecione um entregador antes de enviar o pedido para rota.', 'error');
       return;
     }
     setBusy(order.id); setNotice('');
     const assignment = await assignCompanyOrderDriver(order.id, driverId);
     if (!assignment.ok) {
-      setNotice(assignment.message);
+      showNotice(assignment.message, 'error');
       setBusy('');
       return;
     }
     const result = await advanceOrderStatus(order.id, 'DISPATCHED');
-    if (!result.ok) setNotice(result.message);
-    else { setNotice('Pedido atribuído e enviado para rota.'); await refresh(); }
+    if (!result.ok) showNotice(result.message, 'error');
+    else { showNotice('Pedido atribuído e enviado para rota.', 'success'); await refresh(); }
     setBusy('');
   }
 
@@ -170,7 +208,7 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
       return value === '' || !Number.isFinite(parsed) || parsed < 0;
     });
     if (invalidPrice) {
-      setNotice('Informe um preço final válido para cada item.');
+      showNotice('Informe um preço final válido para cada item.', 'error');
       return;
     }
     setDetailBusy(true);
@@ -178,11 +216,11 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
     const items = detailOrder.items.map((item) => ({ skuId: item.skuId, unitPriceMinor: Math.round(Number(finalPriceValues[item.skuId].replace(',', '.')) * 100) }));
     const result = await setOrderFinalPrices(detailOrder.id, items, finalPriceReason);
     if (!result.ok) {
-      setNotice(result.message);
+      showNotice(result.message, 'error');
       setDetailBusy(false);
       return;
     }
-    setNotice('Preços finais salvos. O cliente já pode revisar o pedido.');
+    showNotice('Preços finais salvos. O cliente já pode revisar o pedido.', 'success');
     closeDetails();
     await refresh();
     setDetailBusy(false);
@@ -216,35 +254,38 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <div className={styles.eyebrow}>OPERAÇÃO</div>
-        <h1>Fila de pedidos</h1>
-        <p>Monitore pedidos em análise e conduza a separação da operação.</p>
+        <div className={styles.eyebrow}>{scope === 'driver' ? 'ENTREGAS' : 'OPERAÇÃO'}</div>
+        <h1>{scope === 'driver' ? 'Entregas atribuídas' : 'Fila de pedidos'}</h1>
+        <p>{scope === 'driver' ? 'Acompanhe os pedidos em rota e confirme cada entrega.' : 'Monitore pedidos em análise e conduza a separação da operação.'}</p>
       </header>
 
       <section className={styles.summary} aria-label="Resumo da fila">
-        <Card><strong>{orders.length}</strong><span>Pedidos carregados</span></Card>
-        <Card><strong>{orders.filter((order) => order.status === 'CONFIRMED').length}</strong><span>Aguardando separação</span></Card>
-        <Card><strong>{orders.filter((order) => order.status === 'PICKING').length}</strong><span>Em separação</span></Card>
+        <Card><strong>{orders.length}</strong><span>{scope === 'driver' ? 'Entregas atribuídas' : 'Pedidos carregados'}</span></Card>
+        <Card><strong>{scope === 'driver' ? orders.filter((order) => order.status === 'DISPATCHED').length : orders.filter((order) => order.status === 'CONFIRMED' || order.status === 'CUSTOMER_CONFIRMED').length}</strong><span>{scope === 'driver' ? 'Em rota' : 'Aguardando separação'}</span></Card>
+        <Card><strong>{scope === 'driver' ? orders.reduce((sum, order) => sum + order.units, 0) : orders.filter((order) => order.status === 'PICKING').length}</strong><span>{scope === 'driver' ? 'Unidades em rota' : 'Em separação'}</span></Card>
       </section>
 
       <Card className={styles.panel}>
         <div className={styles.toolbar}>
-          <Input id="admin-order-search" label="Buscar pedido ou empresa" placeholder="Número ou nome da empresa" value={query} onChange={(event) => setQuery(event.target.value)} />
+          <Input id="admin-order-search" type="search" label="Buscar pedido ou empresa" placeholder="Número ou nome da empresa" value={query} onChange={(event) => setQuery(event.target.value)} />
           <label className={styles.selectLabel} htmlFor="admin-order-status">
             Status
             <select id="admin-order-status" value={status} onChange={(event) => { setStatus(event.target.value); void refresh(event.target.value); }}>
               <option value="">Todos</option>
-              {Object.entries(labels).filter(([key]) => key !== 'RECEIPT_CONFIRMED').map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              {Object.entries(labels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
             </select>
           </label>
+          <Button type="button" variant="tertiary" className={styles.clearFilter} disabled={!query && !status} onClick={() => { setQuery(''); setStatus(''); void refresh(''); }}>Limpar filtros</Button>
         </div>
 
-        {notice && <div className={styles.notice} role="status" aria-live="polite">{notice}</div>}
+        <p className={styles.filterSummary} role="status">{visible.length} pedido{visible.length === 1 ? '' : 's'} exibido{visible.length === 1 ? '' : 's'}{query || status ? ' com os filtros aplicados' : ' na fila'}</p>
+        {detailBusy && !detailOrder && <p className={styles.loading} role="status">Carregando detalhes do pedido…</p>}
+          {notice && !detailOrder && <div className={`${styles.notice} ${noticeTone === 'error' ? styles.errorNotice : ''}`} role={noticeTone === 'error' ? 'alert' : 'status'} aria-live={noticeTone === 'error' ? 'assertive' : 'polite'}>{notice}</div>}
 
         {visible.length === 0 ? (
           <div className={styles.empty} role="status">
             <strong>Nenhum pedido encontrado</strong>
-            <p>A fila aparecerá aqui quando uma compra for confirmada.</p>
+            <p>{query || status ? 'Tente ajustar a busca ou limpar os filtros.' : 'Os pedidos enviados aparecerão aqui para acompanhamento.'}</p>
           </div>
         ) : (
           <div className={styles.tableWrap}>
@@ -275,9 +316,10 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
         </div>
       </Card>
       {detailOrder && <div className={styles.overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeDetails(); }}>
-        <aside className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby="order-detail-title" aria-describedby="order-detail-context">
+        <aside className={styles.drawer} role="dialog" aria-modal="true" aria-labelledby="order-detail-title" aria-describedby="order-detail-context" aria-busy={detailBusy || Boolean(exportBusy)}>
           <div className={styles.drawerHeader}><div><p className={styles.eyebrow}>DETALHES DO PEDIDO</p><h2 id="order-detail-title">Pedido #{detailOrder.orderNumber}</h2></div><button ref={closeDetailRef} className={styles.close} type="button" onClick={closeDetails} aria-label="Fechar detalhes">×</button></div>
           <div className={styles.drawerMeta} id="order-detail-context"><Badge tone={tone(detailOrder.status)}>{labels[detailOrder.status] ?? detailOrder.status}</Badge><span>{detailOrder.companyName} · {detailOrder.establishmentName}</span><span>{new Date(detailOrder.createdAt).toLocaleString('pt-BR')}</span></div>
+          {notice && <div className={`${styles.notice} ${noticeTone === 'error' ? styles.errorNotice : ''}`} role={noticeTone === 'error' ? 'alert' : 'status'} aria-live={noticeTone === 'error' ? 'assertive' : 'polite'}>{notice}</div>}
           <section className={styles.contact} aria-labelledby="order-contact-title">
             <h3 id="order-contact-title">Contato do cliente</h3>
             <span className={styles.contactName}>{detailOrder.customer?.name || 'Cliente'}</span>
@@ -288,24 +330,24 @@ export function OrdersQueue({ initial, initialError, scope = 'admin' }: Props) {
           </section>
           <section className={styles.contact} aria-labelledby="customer-note-title">
             <h3 id="customer-note-title">Observações do pedido</h3>
-            <p>{detailOrder.customerNote || 'Nenhuma observação informada.'}</p>
+            <p className={styles.customerNote}>{detailOrder.customerNote || 'Nenhuma observação informada.'}</p>
           </section>
-          {detailOrder.status === 'CONFIRMED' && <p className={styles.detailHint}>Confira os itens antes de iniciar a separação.</p>}
+          {(detailOrder.status === 'CONFIRMED' || detailOrder.status === 'CUSTOMER_CONFIRMED') && <p className={styles.detailHint}>Confira os itens antes de iniciar a separação.</p>}
           {detailOrder.status === 'SUBMITTED_FOR_REVIEW' && <section className={styles.priceReview} aria-labelledby="price-review-title">
             <h3 id="price-review-title">Definir preços finais</h3>
             <p className={styles.detailHint}>Informe o preço final por unidade comercial. O preço estimado permanece preservado no histórico.</p>
             <div className={styles.priceFields}>{detailOrder.items.map((item) => <label key={item.id}>
               <span>{item.productName} · {item.variantName} ({item.unit})</span>
-              <input type="number" min="0" step="0.01" inputMode="decimal" aria-label={`Preço final de ${item.productName}`} value={finalPriceValues[item.skuId] ?? ''} onChange={(event) => setFinalPriceValues((current) => ({ ...current, [item.skuId]: event.target.value }))} />
+              <input type="number" min="0" step="0.01" inputMode="decimal" aria-label={`Preço final de ${item.productName}, ${item.variantName}`} disabled={detailBusy} value={finalPriceValues[item.skuId] ?? ''} onChange={(event) => setFinalPriceValues((current) => ({ ...current, [item.skuId]: event.target.value }))} />
               <small>Preço por unidade em reais</small>
             </label>)}</div>
-            <label className={styles.reasonField}><span>Observação (opcional)</span><textarea rows={2} value={finalPriceReason} onChange={(event) => setFinalPriceReason(event.target.value)} maxLength={500} /></label>
+            <label className={styles.reasonField}><span>Observação da análise (opcional)</span><textarea rows={2} disabled={detailBusy} value={finalPriceReason} onChange={(event) => setFinalPriceReason(event.target.value)} maxLength={500} /><small>{finalPriceReason.length}/500 caracteres</small></label>
             <Button type="button" onClick={() => void saveFinalPrices()} disabled={detailBusy}>{detailBusy ? 'Salvando…' : 'Salvar preços finais'}</Button>
           </section>}
           <h3>Itens do pedido</h3>
           <ul className={styles.detailItems}>{detailOrder.items.map(item => <li className={styles.detailItem} key={item.id}><div><strong>{item.productName}</strong><span>{item.brand ? `${item.brand} · ` : ''}{item.variantName} · {item.unit}</span>{item.skuCode && <small>SKU {item.skuCode}</small>}</div><div className={styles.detailNumbers}><strong>{item.quantity}×</strong><span>{money(item.subtotalMinor)}</span></div></li>)}</ul>
           <div className={styles.detailTotals}><span>Total de unidades <strong>{detailOrder.items.reduce((sum, item) => sum + item.quantity, 0)}</strong></span><span>Total <strong>{money(detailOrder.totalMinor)}</strong></span></div>
-          <div className={styles.drawerActions}>{(detailOrder.status === 'CONFIRMED' || detailOrder.status === 'CUSTOMER_CONFIRMED') && <Button type="button" onClick={() => { const order = orders.find(item => item.id === detailOrder.id); if (order) void start(order); closeDetails(); }}>Iniciar separação</Button>}{scope !== 'driver' && <><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=xlsx`}>Baixar Excel</a><a className={styles.downloadButton} href={`/api/operacao/pedidos/${detailOrder.id}/export?format=pdf`}>Baixar PDF</a></>}{<Button type="button" variant="secondary" onClick={closeDetails}>Fechar</Button>}</div>
+          <div className={styles.drawerActions}>{scope !== 'driver' && (detailOrder.status === 'CONFIRMED' || detailOrder.status === 'CUSTOMER_CONFIRMED') && <Button type="button" disabled={busy === detailOrder.id} onClick={() => { const order = orders.find(item => item.id === detailOrder.id); if (order) void start(order).then((started) => { if (started) closeDetails(); }); }}>{busy === detailOrder.id ? 'Iniciando…' : 'Iniciar separação'}</Button>}{scope !== 'driver' && <><Button type="button" variant="secondary" className={styles.downloadButton} disabled={Boolean(exportBusy)} onClick={() => void downloadOrder('xlsx')}>{exportBusy === 'xlsx' ? 'Baixando Excel…' : 'Baixar Excel'}</Button><Button type="button" variant="secondary" className={styles.downloadButton} disabled={Boolean(exportBusy)} onClick={() => void downloadOrder('pdf')}>{exportBusy === 'pdf' ? 'Baixando PDF…' : 'Baixar PDF'}</Button></>}{<Button type="button" variant="secondary" onClick={closeDetails}>Fechar</Button>}</div>
         </aside>
       </div>}
     </main>

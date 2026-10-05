@@ -1,15 +1,17 @@
-.page { max-width: 1120px; margin: 0 auto; padding: 32px; }
+.page { max-width: 1200px; margin: 0 auto; padding: 38px 40px 72px; }
 .backLink { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 16px; color: var(--farta-color-brand-primary); font: var(--farta-type-label); text-decoration: underline; text-underline-offset: 3px; }
-.grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .8fr); grid-template-areas: "items summary" "items history"; align-items: start; gap: 20px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .8fr); grid-template-areas: "items summary" "items history"; align-items: start; gap: 20px; }
 .grid h2 { margin: 0 0 16px; color: var(--farta-color-text-primary); font: var(--farta-type-h3); }
 .summary { grid-area: summary; }
 .summary dl { display: grid; gap: 16px; margin: 0; }
 .summary dl div { display: grid; gap: 4px; }
 .summary dt { color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
 .summary dd { margin: 0; overflow-wrap: anywhere; font: var(--farta-type-body-sm); }
+.customerNote { white-space: pre-wrap; }
 .total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 20px 0; padding-top: 16px; border-top: var(--farta-border-default); }
 .total span { color: var(--farta-color-text-secondary); }
 .total strong { color: var(--farta-color-brand-primary); font: var(--farta-type-number); font-size: 24px; line-height: 30px; }
+.priceHint { margin: -8px 0 16px; color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
 .helper { color: var(--farta-color-text-secondary); font: var(--farta-type-body-sm); }
 .items { grid-area: items; }
 .item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: var(--farta-border-default); }
@@ -29,4 +31,4 @@
 .historyDanger::before { background: var(--farta-color-danger) !important; }
 .history small { color: var(--farta-color-text-secondary); font: var(--farta-type-caption); }
 @media (max-width: 900px) { .grid { grid-template-columns: 1fr; grid-template-areas: "summary" "items" "history"; } }
-@media (max-width: 639px) { .page { padding: 24px 16px; } .item { align-items: flex-start; } .item > strong { text-align: right; } }
+@media (max-width: 639px) { .page { padding: 24px 16px 48px; } .item { align-items: flex-start; } .item > strong { text-align: right; } }

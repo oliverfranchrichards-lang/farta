@@ -1,6 +1,11 @@
-.dialog { width: min(calc(100% - 32px), 480px); max-height: calc(100svh - 32px); padding: 24px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: var(--farta-radius-card); box-shadow: var(--farta-shadow-overlay); }
-.dialog::backdrop { background: rgb(13 30 23 / 56%); }
-.dialog h2 { margin: 0 0 12px; font: var(--farta-type-h3); }
-.dialog p { margin: 0; color: var(--farta-color-text-secondary); line-height: 1.5; }
+.dialog { position: relative; width: min(calc(100% - 32px), 730px); max-height: calc(100svh - 32px); padding: 40px; color: var(--farta-color-text-primary); background: var(--farta-color-surface-primary); border: var(--farta-border-default); border-radius: 16px; box-shadow: var(--farta-shadow-overlay); }
+.dialog::backdrop { background: rgb(20 35 29 / 60%); }
+.dialog h2 { margin: 0 42px 18px 0; font: var(--farta-type-h2); }
+.dialog p { margin: 0; color: var(--farta-color-text-secondary); font: var(--farta-type-body); line-height: 1.5; }
+.close { position: absolute; top: 28px; right: 28px; display: grid; place-items: center; width: 40px; height: 40px; color: var(--farta-color-text-secondary); background: transparent; border: 0; border-radius: var(--farta-radius-control); font-size: 30px; font-weight: 300; line-height: 1; cursor: pointer; }
+.close:hover:not(:disabled) { color: var(--farta-color-text-primary); background: var(--farta-color-surface-secondary); }
+.close:focus-visible { outline: 3px solid var(--farta-color-focus); outline-offset: 2px; }
+.warning { display: flex; align-items: center; gap: 12px; margin-top: 28px; padding: 16px 18px; color: var(--farta-color-warning); background: var(--farta-color-warning-soft); border-radius: var(--farta-radius-control); font: var(--farta-type-body-sm); }
+.warning svg { flex: 0 0 24px; width: 24px; height: 24px; }
 .actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-@media (max-width: 480px) { .actions { flex-direction: column-reverse; } .actions button { width: 100%; } }
+@media (max-width: 480px) { .dialog { padding: 28px 20px; } .close { top: 16px; right: 14px; } .dialog h2 { font-size: 24px; line-height: 30px; } .actions { flex-direction: column-reverse; } .actions button { width: 100%; } }

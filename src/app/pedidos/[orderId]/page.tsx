@@ -48,10 +48,10 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ o
     <PageHeader eyebrow="PEDIDO" title={`#${order.orderNumber}`} description={`${new Date(order.createdAt).toLocaleString("pt-BR")} · ${order.delivery}`} actions={<Badge tone={tone}>{labels[order.status] ?? order.status}</Badge>} />
     <div className={styles.grid}>
       <Card className={styles.summary}>
-        <h2>Resumo</h2>
-        <div><dt>Observações</dt><dd>{order.customerNote || 'Nenhuma observação informada'}</dd></div>
-        <dl><div><dt>Entrega</dt><dd>{order.delivery}</dd></div><div><dt>Endereço</dt><dd>{order.address}</dd></div></dl>
+        <h2>Resumo do pedido</h2>
+        <dl><div><dt>Observações</dt><dd className={styles.customerNote}>{order.customerNote || 'Nenhuma observação informada'}</dd></div><div><dt>Entrega</dt><dd>{order.delivery}</dd></div><div><dt>Endereço</dt><dd>{order.address}</dd></div></dl>
         <div className={styles.total}><span>{order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" ? "Total final" : "Total"}</span><strong>{money(order.totalMinor)}</strong></div>
+        {order.approximateTotalMinor !== null && order.finalTotalMinor === null && <p className={styles.priceHint}>Este é um total aproximado. O valor final será definido pela operação antes da confirmação.</p>}
         {order.status === "PRICED_AWAITING_CUSTOMER_CONFIRMATION" && <FinalPriceAction orderId={order.id} />}
         {order.status === "DELIVERED" && <ReceiptAction orderId={order.id} />}
         {(order.status === "CONFIRMED" || order.status === "CUSTOMER_CONFIRMED") && <CancelOrderAction orderId={order.id} />}
